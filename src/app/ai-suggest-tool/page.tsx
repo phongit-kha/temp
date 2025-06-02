@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { UploadCloud, ListChecks, Loader2, AlertTriangle, FileText as FileTextIcon, Type } from 'lucide-react';
+import { UploadCloud, ListChecks, Loader2, AlertTriangle, FileText as FileTextIcon, Type, X, ShoppingCart } from 'lucide-react';
 import { suggestToolsFromUpload, SuggestToolsFromUploadOutput } from '@/ai/flows/suggest-tool-from-upload';
 import { useToast } from '@/hooks/use-toast';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -77,11 +77,12 @@ const AiSuggestToolPage = () => {
 
     try {
       const result: SuggestToolsFromUploadOutput = await suggestToolsFromUpload({ documentContent: documentInput });
-      if (result && result.suggestedTools) {
+      if (result && result.suggestedTools && result.suggestedTools.length > 0) {
         setSuggestions(result.suggestedTools);
       } else {
-        setError('AI could not suggest tools based on this input.');
-        toast({ title: "Suggestion Error", description: "AI could not process the input for suggestions.", variant: "destructive" });
+        setSuggestions([]); // Ensure suggestions is an empty array if no tools or invalid result
+        setError('AI could not suggest tools based on this input or returned no suggestions.');
+        toast({ title: "No Suggestions", description: "AI could not find any tool suggestions for this input.", variant: "default" });
       }
     } catch (err) {
       console.error("AI suggestion error:", err);
@@ -91,6 +92,25 @@ const AiSuggestToolPage = () => {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleRemoveSuggestion = (indexToRemove: number) => {
+    setSuggestions(prev => prev.filter((_, index) => index !== indexToRemove));
+    toast({ title: "Tool removed", description: "The tool has been removed from the suggestion list." });
+  };
+
+  const handleAddAllToCart = () => {
+    if (suggestions.length === 0) {
+      toast({ title: "No tools to add", description: "The suggestion list is empty.", variant: "destructive" });
+      return;
+    }
+    // Mock action: In a real app, map suggestions to Tool objects and add to cart state
+    console.log("Adding to cart (mock):", suggestions);
+    toast({
+      title: "Added to Cart (Mock)",
+      description: `${suggestions.length} tool(s) have been notionally added to your cart.`,
+    });
+    // Optionally clear suggestions: setSuggestions([]);
   };
 
   const isSubmitDisabled = () => {
@@ -109,7 +129,7 @@ const AiSuggestToolPage = () => {
         </CardHeader>
         <form onSubmit={handleSubmit}>
           <CardContent className="space-y-6">
-            <Tabs value={inputType} onValueChange={(value) => setInputType(value as 'text' | 'file')} className="w-full">
+            <Tabs value={inputType} onValueChange={(value) => { setInputType(value as 'text' | 'file'); setError(null); setSuggestions([]); }} className="w-full">
               <TabsList className="grid w-full grid-cols-2">
                 <TabsTrigger value="text">
                   <Type className="mr-2 h-5 w-5" /> Text Input
@@ -178,12 +198,31 @@ const AiSuggestToolPage = () => {
 
             {suggestions.length > 0 && (
               <div className="mt-6 pt-6 border-t">
-                <h3 className="text-lg font-semibold mb-3 font-headline">Suggested Tools:</h3>
-                <ul className="list-disc list-inside space-y-1 bg-secondary/30 p-4 rounded-md">
-                  {suggestions.map((tool, index) => (
-                    <li key={index} className="text-sm">{tool}</li>
-                  ))}
-                </ul>
+                <div className="flex justify-between items-center mb-3">
+                  <h3 className="text-lg font-semibold font-headline">Suggested Tools:</h3>
+                </div>
+                <div className="space-y-2 bg-secondary/30 p-4 rounded-md">
+                  <ul className="space-y-1">
+                    {suggestions.map((tool, index) => (
+                      <li key={index} className="flex items-center justify-between p-2 -mx-2 rounded-md hover:bg-background/50 transition-colors group">
+                        <span className="text-sm flex-1 truncate" title={tool}>{tool}</span>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => handleRemoveSuggestion(index)}
+                          className="h-7 w-7 opacity-50 group-hover:opacity-100 ml-2"
+                          aria-label={`Remove ${tool}`}
+                        >
+                          <X className="h-4 w-4" />
+                        </Button>
+                      </li>
+                    ))}
+                  </ul>
+                  <Button onClick={handleAddAllToCart} className="w-full mt-3">
+                    <ShoppingCart className="mr-2 h-4 w-4" />
+                    Add All to Cart ({suggestions.length})
+                  </Button>
+                </div>
               </div>
             )}
           </CardContent>
@@ -200,4 +239,3 @@ const AiSuggestToolPage = () => {
 };
 
 export default AiSuggestToolPage;
-
