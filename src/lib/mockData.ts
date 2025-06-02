@@ -1,3 +1,4 @@
+
 import type { Tool, CategoryInfo, BlogArticle, QuickTopic, HowToUseStep } from '@/types';
 
 export const mockCategories: CategoryInfo[] = [
@@ -173,6 +174,39 @@ export const mockBlogArticles: BlogArticle[] = [
     cost: 'Low',
     date: '2023-09-15',
   },
+  {
+    slug: 'painting-like-a-pro',
+    title: 'Painting Techniques for a Professional Finish',
+    excerpt: 'Learn simple techniques to make your next painting project look like it was done by a professional.',
+    thumbnail: 'https://placehold.co/400x250.png',
+    aiHint: 'painting wall',
+    difficulty: 'Easy',
+    duration: '3-4 hours',
+    cost: 'Low',
+    date: '2023-11-10',
+  },
+  {
+    slug: 'choosing-right-ladder',
+    title: 'Choosing the Right Ladder for the Job',
+    excerpt: 'Safety first! This guide helps you select the appropriate ladder for different tasks around the house.',
+    thumbnail: 'https://placehold.co/400x250.png',
+    aiHint: 'ladder safety',
+    difficulty: 'Easy',
+    duration: '30 min read',
+    cost: 'Varies',
+    date: '2023-10-01',
+  },
+  {
+    slug: 'garden-tool-maintenance',
+    title: 'Essential Maintenance for Your Gardening Tools',
+    excerpt: 'Keep your gardening tools in top shape with these simple maintenance tips for longevity and performance.',
+    thumbnail: 'https://placehold.co/400x250.png',
+    aiHint: 'gardening tools',
+    difficulty: 'Easy',
+    duration: '1 hour',
+    cost: 'Very Low',
+    date: '2023-09-20',
+  }
 ];
 
 export const beginnerAdviceArticles: BlogArticle[] = mockBlogArticles.filter(article => article.difficulty === 'Easy');

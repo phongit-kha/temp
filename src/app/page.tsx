@@ -109,6 +109,9 @@ export default function HomePage() {
     setSearchTerm(e.target.value);
   };
 
+  const displayedBeginnerArticles = (beginnerAdviceArticles.length > 0 ? beginnerAdviceArticles : mockBlogArticles.filter(a => a.difficulty === 'Easy')).slice(0, 6);
+
+
   return (
     <div className="flex flex-col min-h-screen">
       {/* Hero Section */}
@@ -202,8 +205,8 @@ export default function HomePage() {
           <h2 className="font-headline text-3xl font-bold text-center mb-10">Browse by Category</h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
             {mockCategories.map((category) => (
-              <Link key={category.id} href={`/equipment?category=${category.id}`} className="block group">
-                <Card className="overflow-hidden hover:shadow-xl transition-shadow duration-300">
+              <Link key={category.id} href={`/equipment?category=${category.id}`} className="block group h-full">
+                <Card className="overflow-hidden hover:shadow-xl transition-shadow duration-300 h-full flex flex-col">
                   <CardHeader className="p-0">
                     <Image
                       src={category.image}
@@ -214,7 +217,7 @@ export default function HomePage() {
                       data-ai-hint={category.aiHint}
                     />
                   </CardHeader>
-                  <CardContent className="p-4">
+                  <CardContent className="p-4 flex flex-col flex-grow justify-center items-center">
                     <h3 className="font-headline text-lg font-semibold text-center group-hover:text-accent transition-colors">{category.name}</h3>
                   </CardContent>
                 </Card>
@@ -263,7 +266,7 @@ export default function HomePage() {
             </Button>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {(beginnerAdviceArticles.length > 0 ? beginnerAdviceArticles : mockBlogArticles).slice(0, 3).map((article) => (
+            {displayedBeginnerArticles.map((article) => (
               <BlogCard key={article.slug} article={article} />
             ))}
           </div>
