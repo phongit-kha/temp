@@ -64,7 +64,7 @@ const EquipmentListPage = () => {
         onChange={(e) => setSearchTerm(e.target.value)}
         className="w-full"
       />
-      <Accordion type="multiple" defaultValue={['categories', 'price']} collapsible className="w-full">
+      <Accordion type="multiple" defaultValue={['categories', 'price']} className="w-full">
         <AccordionItem value="categories">
           <AccordionTrigger className="text-base font-semibold">Categories</AccordionTrigger>
           <AccordionContent className="space-y-2 pt-2">
