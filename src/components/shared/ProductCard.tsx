@@ -60,16 +60,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ tool, layout = 'vertical', on
             </Link>
           </Button>
         </div>
-        {onToggleCompare && typeof isSelectedForCompare === 'boolean' && (
-          <Button
-            variant={isSelectedForCompare ? "default" : "outline"}
-            className="w-full whitespace-normal"
-            onClick={() => onToggleCompare(tool.id)}
-          >
-            {isSelectedForCompare ? <CheckCircle className="mr-2 h-4 w-4" /> : <PlusCircle className="mr-2 h-4 w-4" />}
-            {isSelectedForCompare ? "Added to Compare" : "Add to Compare"}
-          </Button>
-        )}
+        {/* The "Add to Compare" button was here and has been removed */}
       </CardFooter>
     </Card>
   );
