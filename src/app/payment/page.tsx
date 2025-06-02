@@ -39,7 +39,7 @@ const PaymentPage = () => {
       toast.success("Payment Successful!", { // Changed toast
         description: "Your rental has been confirmed.",
       });
-      router.push(\`/confirmation-document?payment_status=success&rental_id=mock-rental-123\`);
+      router.push(`/confirmation-document?payment_status=success&rental_id=mock-rental-123`);
     } else {
       setStatus('failure');
       toast.error("Payment Failed", { // Changed toast
@@ -94,10 +94,10 @@ const PaymentPage = () => {
                 ].map(opt => (
                   <Label
                     key={opt.value}
-                    htmlFor={\`payment-\${opt.value}\`}
-                    className={\`flex items-center p-3 border rounded-md cursor-pointer transition-all \${paymentMethod === opt.value ? 'border-primary ring-2 ring-primary bg-primary/5' : 'hover:border-muted-foreground/70'}\`}
+                    htmlFor={`payment-${opt.value}`}
+                    className={`flex items-center p-3 border rounded-md cursor-pointer transition-all ${paymentMethod === opt.value ? 'border-primary ring-2 ring-primary bg-primary/5' : 'hover:border-muted-foreground/70'}`}
                   >
-                    <RadioGroupItem value={opt.value} id={\`payment-\${opt.value}\`} className="mr-3" />
+                    <RadioGroupItem value={opt.value} id={`payment-${opt.value}`} className="mr-3" />
                     {opt.icon}
                     <span className="text-sm font-medium">{opt.label}</span>
                   </Label>
