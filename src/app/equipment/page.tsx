@@ -17,7 +17,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/
 import { Card, CardContent } from '@/components/ui/card';
 import { ListFilter, LayoutGrid, LayoutList, GitCompareArrows } from 'lucide-react';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner'; // Changed import
 
 const MAX_COMPARE_ITEMS = 4;
 
@@ -59,11 +59,11 @@ const EquipmentFilterPanel: React.FC<EquipmentFilterPanelProps> = ({
             {mockCategories.map((category: CategoryInfo) => (
               <div key={category.id} className="flex items-center space-x-2">
                 <Checkbox
-                  id={`cat-${category.id}`}
+                  id={\`cat-\${category.id}\`}
                   checked={selectedCategories.includes(category.id)}
                   onCheckedChange={() => onCategoryChange(category.id)}
                 />
-                <Label htmlFor={`cat-${category.id}`} className="font-normal cursor-pointer">{category.name}</Label>
+                <Label htmlFor={\`cat-\${category.id}\`} className="font-normal cursor-pointer">{category.name}</Label>
               </div>
             ))}
           </AccordionContent>
@@ -108,10 +108,8 @@ const EquipmentFilterPanel: React.FC<EquipmentFilterPanelProps> = ({
   );
 };
 
-
 const EquipmentListPage = () => {
   const searchParams = useSearchParams();
-  const { toast } = useToast();
   const [filteredTools, setFilteredTools] = useState<Tool[]>(mockTools);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 5000]);
@@ -143,10 +141,6 @@ const EquipmentListPage = () => {
     }
 
     tools = tools.filter(tool => tool.priceRent >= priceRange[0] && tool.priceRent <= priceRange[1]);
-
-    // Note: rentalDuration filter is not fully implemented in this effect as its logic can be complex (e.g., matching against tool availability for specific durations).
-    // For now, it's a state placeholder.
-
     setFilteredTools(tools);
   }, [selectedCategories, priceRange, rentalDuration, searchTerm]);
 
@@ -159,17 +153,15 @@ const EquipmentListPage = () => {
   const handleToggleCompareItem = (toolId: string) => {
     setSelectedCompareIds(prevIds => {
       if (prevIds.includes(toolId)) {
-        toast({ title: "Removed from Compare", description: `${mockTools.find(t=>t.id === toolId)?.name} removed from comparison.` });
+        toast("Removed from Compare", { description: \`\${mockTools.find(t=>t.id === toolId)?.name} removed from comparison.\` }); // Changed toast
         return prevIds.filter(id => id !== toolId);
       } else {
         if (prevIds.length < MAX_COMPARE_ITEMS) {
-          toast({ title: "Added to Compare", description: `${mockTools.find(t=>t.id === toolId)?.name} added for comparison.` });
+          toast("Added to Compare", { description: \`\${mockTools.find(t=>t.id === toolId)?.name} added for comparison.\` }); // Changed toast
           return [...prevIds, toolId];
         } else {
-          toast({
-            title: "Comparison Limit Reached",
-            description: `You can only select up to ${MAX_COMPARE_ITEMS} tools for comparison.`,
-            variant: "destructive",
+          toast.error("Comparison Limit Reached", { // Changed toast
+            description: \`You can only select up to \${MAX_COMPARE_ITEMS} tools for comparison.\`,
           });
           return prevIds;
         }
@@ -185,11 +177,9 @@ const EquipmentListPage = () => {
     setSelectedCompareIds([]);
   };
 
-
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="flex flex-col md:flex-row gap-8">
-        {/* Desktop Filter Panel */}
         <aside className="hidden md:block md:w-1/4 lg:w-1/5 sticky top-20 h-fit">
           <h2 className="text-xl font-bold mb-4 font-headline">Filters</h2>
           <EquipmentFilterPanel
@@ -209,7 +199,6 @@ const EquipmentListPage = () => {
           <div className="flex justify-between items-center mb-6">
             <h1 className="text-3xl font-bold font-headline">Equipment List</h1>
             <div className="flex items-center gap-2">
-              {/* Mobile Filter Trigger */}
               <Sheet>
                 <SheetTrigger asChild className="md:hidden">
                   <Button variant="outline" size="icon">
@@ -247,7 +236,7 @@ const EquipmentListPage = () => {
                   {selectedCompareIds.length} / {MAX_COMPARE_ITEMS} tools selected for comparison.
                 </p>
                 <Button asChild>
-                  <Link href={`/compare?products=${selectedCompareIds.join(',')}`}>
+                  <Link href={\`/compare?products=\${selectedCompareIds.join(',')}\`}>
                     <GitCompareArrows className="mr-2 h-4 w-4" /> Compare Selected
                   </Link>
                 </Button>
@@ -256,7 +245,7 @@ const EquipmentListPage = () => {
           )}
 
           {filteredTools.length > 0 ? (
-            <div className={`grid gap-6 ${layout === 'grid' ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3' : 'grid-cols-1'}`}>
+            <div className={\`grid gap-6 \${layout === 'grid' ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3' : 'grid-cols-1'}\`}>
               {filteredTools.map(tool => (
                 <ProductCard 
                   key={tool.id} 
@@ -272,7 +261,6 @@ const EquipmentListPage = () => {
               <p className="text-xl text-muted-foreground">No tools found matching your criteria.</p>
             </div>
           )}
-          {/* Pagination placeholder */}
           <div className="mt-12 flex justify-center">
             <Button variant="outline">Load More</Button>
           </div>

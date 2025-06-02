@@ -1,21 +1,21 @@
+
 'use client';
 
-import { useState, ChangeEvent }_ from 'react';
+import { useState, ChangeEvent } from 'react'; // Removed _ import
 import { useParams, useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { UploadCloud, FileText, Image as ImageIcon, Loader2, CheckCircle, AlertTriangle } from 'lucide-react';
-import Image from 'next/image'; // For image preview
-import { useToast } from '@/hooks/use-toast';
+import { UploadCloud, FileText, Image as ImageIcon, Loader2, CheckCircle, AlertTriangle, X } from 'lucide-react'; // Added X
+import Image from 'next/image'; 
+import { toast } from 'sonner'; // Changed import
 
 type UploadStatus = 'idle' | 'uploading' | 'success' | 'failure';
 
 const UploadEvidencePage = () => {
   const params = useParams();
   const router = useRouter();
-  const { toast } = useToast();
   const rentalId = params.rentalId as string;
   
   const [files, setFiles] = useState<File[]>([]);
@@ -25,15 +25,14 @@ const UploadEvidencePage = () => {
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
     if (event.target.files) {
       const selectedFiles = Array.from(event.target.files);
-      setFiles(prevFiles => [...prevFiles, ...selectedFiles].slice(0, 5)); // Limit to 5 files
+      setFiles(prevFiles => [...prevFiles, ...selectedFiles].slice(0, 5)); 
 
       const newPreviews: string[] = [];
       selectedFiles.slice(0, 5 - files.length).forEach(file => {
         if (file.type.startsWith('image/')) {
           newPreviews.push(URL.createObjectURL(file));
         } else {
-          // Placeholder for non-image files, or handle differently
-          newPreviews.push('file_icon'); // Special string to indicate a generic file
+          newPreviews.push('file_icon'); 
         }
       });
       setPreviews(prevPreviews => [...prevPreviews, ...newPreviews].slice(0,5));
@@ -48,24 +47,21 @@ const UploadEvidencePage = () => {
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (files.length === 0) {
-      toast({ title: "No files selected", description: "Please select files to upload.", variant: "destructive" });
+      toast.error("No files selected", { description: "Please select files to upload." }); // Changed toast
       return;
     }
     setUploadStatus('uploading');
-
-    // Simulate API call for upload
-    // In a real app, you'd use FormData and fetch/axios to send files to a backend
+    
     await new Promise(resolve => setTimeout(resolve, 3000));
     
-    const isSuccess = Math.random() > 0.2; // 80% success
+    const isSuccess = Math.random() > 0.2; 
     if (isSuccess) {
       setUploadStatus('success');
-      toast({ title: "Evidence Uploaded!", description: "Your return evidence has been submitted successfully." });
-      // Optionally redirect or update UI
-      setTimeout(() => router.push(`/rent-detail/${rentalId}`), 2000);
+      toast.success("Evidence Uploaded!", { description: "Your return evidence has been submitted successfully." }); // Changed toast
+      setTimeout(() => router.push(\`/rent-detail/\${rentalId}\`), 2000);
     } else {
       setUploadStatus('failure');
-      toast({ title: "Upload Failed", description: "Could not upload files. Please try again.", variant: "destructive" });
+      toast.error("Upload Failed", { description: "Could not upload files. Please try again." }); // Changed toast
     }
   };
 
@@ -110,7 +106,7 @@ const UploadEvidencePage = () => {
                            <p className="text-xs text-muted-foreground mt-1 truncate px-1" title={files[index]?.name}>{files[index]?.name}</p>
                          </div>
                       ) : (
-                        <Image src={preview} alt={`Preview ${index + 1}`} layout="fill" objectFit="cover" className="rounded" />
+                        <Image src={preview} alt={\`Preview \${index + 1}\`} layout="fill" objectFit="cover" className="rounded" />
                       )}
                       <button
                         type="button"
@@ -133,7 +129,6 @@ const UploadEvidencePage = () => {
                 <p className="text-sm font-medium">Upload failed. Please try again.</p>
               </div>
             )}
-
 
           </CardContent>
           <CardFooter>

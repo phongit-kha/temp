@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState } from 'react';
@@ -8,19 +9,17 @@ import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { CreditCard, Wallet, Truck, Loader2, CheckCircle, AlertCircle } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner'; // Changed import
 
 type PaymentStatus = 'idle' | 'processing' | 'success' | 'failure';
 
 const PaymentPage = () => {
   const router = useRouter();
-  const { toast } = useToast();
   const [paymentMethod, setPaymentMethod] = useState('card');
   const [cardDetails, setCardDetails] = useState({ number: '', expiry: '', cvc: '', name: '' });
   const [status, setStatus] = useState<PaymentStatus>('idle');
 
-  // Mock total amount - in a real app, this would come from cart/order state
-  const totalAmount = 850; // Example: ฿800 tools + ฿50 add-on
+  const totalAmount = 850; 
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -31,30 +30,20 @@ const PaymentPage = () => {
     e.preventDefault();
     setStatus('processing');
 
-    // Simulate API call
     await new Promise(resolve => setTimeout(resolve, 2500));
 
-    // Simulate success/failure
-    const isSuccess = Math.random() > 0.2; // 80% success rate
+    const isSuccess = Math.random() > 0.2; 
 
     if (isSuccess) {
       setStatus('success');
-      toast({
-        title: "Payment Successful!",
+      toast.success("Payment Successful!", { // Changed toast
         description: "Your rental has been confirmed.",
-        variant: "default",
       });
-      // As per spec: "Redirects to Confirmation Document page upon successful payment"
-      // This is unusual. A more common flow is to a rental detail / order status page.
-      // I'm implementing the spec, but this might need UX review.
-      // Adding a query param to ConfirmationDocumentPage to show success message.
-      router.push(`/confirmation-document?payment_status=success&rental_id=mock-rental-123`);
+      router.push(\`/confirmation-document?payment_status=success&rental_id=mock-rental-123\`);
     } else {
       setStatus('failure');
-      toast({
-        title: "Payment Failed",
+      toast.error("Payment Failed", { // Changed toast
         description: "Please try again or use a different payment method.",
-        variant: "destructive",
       });
     }
   };
@@ -86,7 +75,6 @@ const PaymentPage = () => {
     );
   }
 
-
   return (
     <div className="container mx-auto px-4 py-8">
       <Card className="max-w-xl mx-auto">
@@ -106,10 +94,10 @@ const PaymentPage = () => {
                 ].map(opt => (
                   <Label
                     key={opt.value}
-                    htmlFor={`payment-${opt.value}`}
-                    className={`flex items-center p-3 border rounded-md cursor-pointer transition-all ${paymentMethod === opt.value ? 'border-primary ring-2 ring-primary bg-primary/5' : 'hover:border-muted-foreground/70'}`}
+                    htmlFor={\`payment-\${opt.value}\`}
+                    className={\`flex items-center p-3 border rounded-md cursor-pointer transition-all \${paymentMethod === opt.value ? 'border-primary ring-2 ring-primary bg-primary/5' : 'hover:border-muted-foreground/70'}\`}
                   >
-                    <RadioGroupItem value={opt.value} id={`payment-${opt.value}`} className="mr-3" />
+                    <RadioGroupItem value={opt.value} id={\`payment-\${opt.value}\`} className="mr-3" />
                     {opt.icon}
                     <span className="text-sm font-medium">{opt.label}</span>
                   </Label>
@@ -144,7 +132,6 @@ const PaymentPage = () => {
             {paymentMethod === 'ewallet' && (
               <div className="p-4 border rounded-md bg-secondary/50 text-center">
                 <p className="text-muted-foreground">You will be redirected to your E-Wallet provider to complete the payment.</p>
-                {/* E-wallet options can be listed here */}
               </div>
             )}
 

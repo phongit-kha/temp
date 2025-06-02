@@ -1,9 +1,9 @@
 
 import type { Metadata } from 'next';
 import './globals.css';
-import { Toaster } from "@/components/ui/toaster";
+import { Toaster as SonnerToaster } from 'sonner'; // Changed import
 import AppLayout from '@/components/layout/AppLayout';
-import { CartProvider } from '@/contexts/CartContext'; // Added CartProvider import
+import { CartProvider } from '@/contexts/CartContext';
 
 export const metadata: Metadata = {
   title: 'Chang Chao - Online Tool Rentals',
@@ -24,12 +24,12 @@ export default function RootLayout({
         <link href="https://fonts.googleapis.com/css2?family=Source+Code+Pro:wght@400;500&display=swap" rel="stylesheet" />
       </head>
       <body className="font-body antialiased" suppressHydrationWarning={true}>
-        <CartProvider> {/* Wrapped AppLayout with CartProvider */}
+        <CartProvider>
           <AppLayout>
             {children}
           </AppLayout>
         </CartProvider>
-        <Toaster />
+        <SonnerToaster richColors position="bottom-right" /> {/* Changed Toaster */}
       </body>
     </html>
   );

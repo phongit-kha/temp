@@ -8,12 +8,11 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { UploadCloud, ListChecks, Loader2, AlertTriangle, FileText as FileTextIcon, Type, X, ShoppingCart } from 'lucide-react';
 import { suggestToolsFromUpload, SuggestToolsFromUploadOutput } from '@/ai/flows/suggest-tool-from-upload';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner'; // Changed import
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
 
 const AiSuggestToolPage = () => {
-  const { toast } = useToast();
   const [inputType, setInputType] = useState<'text' | 'file'>('text');
   const [projectDescription, setProjectDescription] = useState<string>('');
   const [file, setFile] = useState<File | null>(null);
@@ -46,7 +45,7 @@ const AiSuggestToolPage = () => {
         setError('Unsupported file type. Please upload a text, DOC, DOCX, or PDF file.');
         setFile(null);
         setFileContent('');
-        toast({ title: "Unsupported File", description: "Please upload a document file (TXT, DOC, DOCX, PDF).", variant: "destructive" });
+        toast.error("Unsupported File", { description: "Please upload a document file (TXT, DOC, DOCX, PDF)." }); // Changed toast
       }
     }
   };
@@ -58,14 +57,14 @@ const AiSuggestToolPage = () => {
     if (inputType === 'text') {
       if (!projectDescription.trim()) {
         setError('Please enter a project description.');
-        toast({ title: "No Description", description: "Please enter your project description.", variant: "destructive" });
+        toast.error("No Description", { description: "Please enter your project description." }); // Changed toast
         return;
       }
       documentInput = projectDescription;
     } else { // inputType === 'file'
       if (!file || !fileContent) {
         setError('Please select a file and ensure its content can be read.');
-        toast({ title: "No File Content", description: "Please select a file with readable content.", variant: "destructive" });
+        toast.error("No File Content", { description: "Please select a file with readable content." }); // Changed toast
         return;
       }
       documentInput = fileContent;
@@ -80,15 +79,15 @@ const AiSuggestToolPage = () => {
       if (result && result.suggestedTools && result.suggestedTools.length > 0) {
         setSuggestions(result.suggestedTools);
       } else {
-        setSuggestions([]); // Ensure suggestions is an empty array if no tools or invalid result
+        setSuggestions([]); 
         setError('AI could not suggest tools based on this input or returned no suggestions.');
-        toast({ title: "No Suggestions", description: "AI could not find any tool suggestions for this input.", variant: "default" });
+        toast("No Suggestions", { description: "AI could not find any tool suggestions for this input." }); // Changed toast
       }
     } catch (err) {
       console.error("AI suggestion error:", err);
       const errorMessage = err instanceof Error ? err.message : 'An unknown error occurred with the AI service.';
-      setError(`Failed to get suggestions: ${errorMessage}`);
-      toast({ title: "AI Service Error", description: `Failed to get suggestions: ${errorMessage}`, variant: "destructive" });
+      setError(\`Failed to get suggestions: \${errorMessage}\`);
+      toast.error("AI Service Error", { description: \`Failed to get suggestions: \${errorMessage}\` }); // Changed toast
     } finally {
       setIsLoading(false);
     }
@@ -96,21 +95,18 @@ const AiSuggestToolPage = () => {
 
   const handleRemoveSuggestion = (indexToRemove: number) => {
     setSuggestions(prev => prev.filter((_, index) => index !== indexToRemove));
-    toast({ title: "Tool removed", description: "The tool has been removed from the suggestion list." });
+    toast("Tool removed", { description: "The tool has been removed from the suggestion list." }); // Changed toast
   };
 
   const handleAddAllToCart = () => {
     if (suggestions.length === 0) {
-      toast({ title: "No tools to add", description: "The suggestion list is empty.", variant: "destructive" });
+      toast.error("No tools to add", { description: "The suggestion list is empty." }); // Changed toast
       return;
     }
-    // Mock action: In a real app, map suggestions to Tool objects and add to cart state
     console.log("Adding to cart (mock):", suggestions);
-    toast({
-      title: "Added to Cart (Mock)",
-      description: `${suggestions.length} tool(s) have been notionally added to your cart.`,
+    toast("Added to Cart (Mock)", { // Changed toast
+      description: \`\${suggestions.length} tool(s) have been notionally added to your cart.\`,
     });
-    // Optionally clear suggestions: setSuggestions([]);
   };
 
   const isSubmitDisabled = () => {
