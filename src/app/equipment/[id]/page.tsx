@@ -10,6 +10,7 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Label } from '@/components/ui/label';
 import { CalendarIcon, ChevronLeft, ChevronRight, AlertTriangle, ShoppingCart, Tag, PlusCircle, Star } from 'lucide-react';
 import { format } from "date-fns";
 import ProductCard from '@/components/shared/ProductCard';
