@@ -48,13 +48,13 @@ const ProductCard: React.FC<ProductCardProps> = ({ tool, layout = 'vertical', on
       <CardFooter className="p-4 pt-2 flex flex-col gap-2">
         <div className="flex flex-col sm:flex-row gap-2">
           {tool.priceBuy && (
-            <Button variant="outline" className="w-full sm:w-auto flex-1" asChild>
+            <Button variant="outline" className="w-full sm:w-auto flex-1 whitespace-normal" asChild>
               <Link href={`/equipment/${tool.id}?action=buy`}>
                 <Tag className="mr-2 h-4 w-4" /> Buy: ฿{tool.priceBuy.toLocaleString()}
               </Link>
             </Button>
           )}
-          <Button variant="default" className="w-full sm:w-auto flex-1" asChild>
+          <Button variant="default" className="w-full sm:w-auto flex-1 whitespace-normal" asChild>
              <Link href={`/equipment/${tool.id}?action=rent`}>
               <ShoppingCart className="mr-2 h-4 w-4" /> Rent: ฿{tool.priceRent.toLocaleString()}
             </Link>
@@ -63,7 +63,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ tool, layout = 'vertical', on
         {onToggleCompare && typeof isSelectedForCompare === 'boolean' && (
           <Button
             variant={isSelectedForCompare ? "default" : "outline"}
-            className="w-full"
+            className="w-full whitespace-normal"
             onClick={() => onToggleCompare(tool.id)}
           >
             {isSelectedForCompare ? <CheckCircle className="mr-2 h-4 w-4" /> : <PlusCircle className="mr-2 h-4 w-4" />}
