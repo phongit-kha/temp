@@ -18,7 +18,7 @@ import { CalendarIcon, ChevronLeft, ChevronRight, AlertTriangle, ShoppingCart, T
 import { format } from "date-fns";
 import ProductCard from '@/components/shared/ProductCard';
 import { cn } from '@/lib/utils';
-import { toast } from 'sonner'; // Changed import
+import { toast } from 'sonner';
 import { useCart } from '@/contexts/CartContext';
 
 const EquipmentDetailsPage = () => {
@@ -74,13 +74,13 @@ const EquipmentDetailsPage = () => {
         days = 1; 
       }
       if (days <= 0 && action === 'rent') days = 1;
-      rentalDurationString = days === 1 ? '1day' : \`\${days}days\`; 
+      rentalDurationString = days === 1 ? '1day' : `${days}days`; 
     }
 
     cart.addToCart(tool, action, quantity, rentalDurationString);
     
-    toast.success("Added to Cart!", { // Changed toast
-      description: \`\${tool.name} (x\${quantity}) has been added to your cart for \${action}\${action === 'rent' ? \` (\${days} day\${days !==1 ? 's':''})\` : ''}.\`,
+    toast.success("Added to Cart!", {
+      description: `${tool.name} (x${quantity}) has been added to your cart for ${action}${action === 'rent' ? ` (${days} day${days !==1 ? 's':''})` : ''}.`,
     });
   };
 
@@ -138,10 +138,10 @@ const EquipmentDetailsPage = () => {
             ])].slice(0,4).map((imgUrl, idx) => (
               <button
                 key={idx}
-                className={`aspect-square rounded-md overflow-hidden border-2 transition-all \${selectedImage === imgUrl ? 'border-primary scale-105' : 'border-transparent hover:border-muted'}`}
+                className={`aspect-square rounded-md overflow-hidden border-2 transition-all ${selectedImage === imgUrl ? 'border-primary scale-105' : 'border-transparent hover:border-muted'}`}
                 onClick={() => setSelectedImage(imgUrl)}
               >
-                <Image src={imgUrl} alt={\`\${tool.name} thumbnail \${idx + 1}\`} width={100} height={100} className="object-cover w-full h-full" data-ai-hint="tool thumbnail" />
+                <Image src={imgUrl} alt={`${tool.name} thumbnail ${idx + 1}`} width={100} height={100} className="object-cover w-full h-full" data-ai-hint="tool thumbnail" />
               </button>
             ))}
           </div>
@@ -153,7 +153,7 @@ const EquipmentDetailsPage = () => {
               {tool.categories.map(cat => <Badge key={cat} variant="secondary">{cat.replace('-', ' ').toUpperCase()}</Badge>)}
             </div>
              {isLowStock && <Badge variant="destructive" className="flex items-center"><AlertTriangle className="h-4 w-4 mr-1" /> {tool.stock} items available</Badge>}
-             {!isLowStock && <p className={\`text-sm font-semibold \${stockColor}\`}>{tool.stock} items available</p>}
+             {!isLowStock && <p className={`text-sm font-semibold ${stockColor}`}>{tool.stock} items available</p>}
           </div>
           
           <h1 className="text-3xl lg:text-4xl font-bold font-headline mb-1">{tool.name}</h1>
@@ -162,7 +162,7 @@ const EquipmentDetailsPage = () => {
           {tool.rating && (
             <div className="flex items-center mb-4">
               {[...Array(5)].map((_, i) => (
-                <Star key={i} className={\`h-5 w-5 \${i < Math.round(tool.rating!) ? 'text-yellow-400 fill-yellow-400' : 'text-gray-300'}\`} />
+                <Star key={i} className={`h-5 w-5 ${i < Math.round(tool.rating!) ? 'text-yellow-400 fill-yellow-400' : 'text-gray-300'}`} />
               ))}
               <span className="ml-2 text-sm text-muted-foreground">({tool.rating} reviews)</span>
             </div>
@@ -224,7 +224,7 @@ const EquipmentDetailsPage = () => {
                 <Button 
                   size="lg" 
                   variant={isPurchaseCheaper ? "default" : "outline"} 
-                  className={\`flex-1 \${isPurchaseCheaper ? 'ring-2 ring-offset-2 ring-primary transform scale-105' : ''}\`}
+                  className={`flex-1 ${isPurchaseCheaper ? 'ring-2 ring-offset-2 ring-primary transform scale-105' : ''}`}
                   onClick={() => handleAddToCart('buy')}
                   disabled={tool.stock === 0}
                 >
@@ -234,12 +234,12 @@ const EquipmentDetailsPage = () => {
               <Button 
                 size="lg" 
                 variant={!purchasePrice || (!isPurchaseCheaper && rentalDays > 0) ? "default" : "outline"} 
-                className={\`flex-1 \${!isPurchaseCheaper && purchasePrice && rentalDays > 0 ? 'ring-2 ring-offset-2 ring-primary transform scale-105' : ''}\`}
+                className={`flex-1 ${!isPurchaseCheaper && purchasePrice && rentalDays > 0 ? 'ring-2 ring-offset-2 ring-primary transform scale-105' : ''}`}
                 onClick={() => handleAddToCart('rent')}
                 disabled={tool.stock === 0 || rentalDays <= 0}
               >
                 <ShoppingCart className="mr-2 h-5 w-5" /> 
-                {rentalDays > 0 ? \`Rent (\฿\${totalRentalPrice.toLocaleString()})\` : \`Rent: \฿\${(rentPricePerDay * quantity).toLocaleString()}/day\`}
+                {rentalDays > 0 ? `Rent (฿${totalRentalPrice.toLocaleString()})` : `Rent: ฿${(rentPricePerDay * quantity).toLocaleString()}/day`}
               </Button>
             </div>
             {tool.stock === 0 && <p className="text-xs text-center mt-2 text-destructive font-medium">Out of stock</p>}
@@ -317,7 +317,7 @@ const EquipmentDetailsPage = () => {
                   </CardHeader>
                   <CardContent className="p-4 sm:p-6 space-y-4">
                     <div className="relative aspect-video rounded-md overflow-hidden border">
-                      <Image src={currentStepData.mediaUrl} alt={\`Step \${currentStepIndex + 1}: \${currentStepData.title}\`} layout="fill" objectFit="cover" data-ai-hint={currentStepData.aiHint || "tutorial image"} />
+                      <Image src={currentStepData.mediaUrl} alt={`Step ${currentStepIndex + 1}: ${currentStepData.title}`} layout="fill" objectFit="cover" data-ai-hint={currentStepData.aiHint || "tutorial image"} />
                     </div>
                     <p className="text-foreground/80 leading-relaxed text-sm sm:text-base">{currentStepData.description}</p>
                   </CardContent>
