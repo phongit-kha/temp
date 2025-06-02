@@ -66,11 +66,10 @@ export default function HomePage() {
           label: topic.text,
           type: 'topic',
           href: topic.link,
-          icon: BookOpen,
+          icon: BookOpen, // Consider different icons for topics
         }));
       
       const combinedSuggestions = [...productSuggestions, ...blogSuggestions, ...topicSuggestions];
-      // Basic duplicate removal by href, preferring products, then blogs, then topics
       const uniqueSuggestions = Array.from(new Map(combinedSuggestions.map(s => [s.href, s])).values());
       
       setSuggestions(uniqueSuggestions.slice(0, 7));
@@ -153,7 +152,7 @@ export default function HomePage() {
                         href={suggestion.href}
                         className="block hover:bg-accent rounded-md"
                         onClick={() => {
-                          setSearchTerm(''); // Clear search term after selection
+                          setSearchTerm(''); 
                           setSuggestionsVisible(false);
                         }}
                       >
@@ -186,12 +185,22 @@ export default function HomePage() {
               <Button
                 key={topic.id}
                 variant="outline"
-                className="h-auto py-6 text-base text-left justify-start items-start flex-col hover:bg-accent hover:text-accent-foreground transition-all duration-300 group"
+                className="relative h-48 text-primary-foreground p-4 text-left flex flex-col justify-between items-start group overflow-hidden focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 rounded-md"
+                style={{
+                  backgroundImage: `linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.2) 40%, rgba(0,0,0,0.7) 100%), url(${topic.image || 'https://placehold.co/400x200.png'})`,
+                  backgroundSize: 'cover',
+                  backgroundPosition: 'center',
+                  borderWidth: '1px', // Explicitly set border width if variant outline is not enough or overridden
+                  borderColor: 'hsl(var(--border))', // Use theme variable for border
+                }}
                 asChild
+                data-ai-hint={topic.aiHint || 'topic background'}
               >
-                <Link href={topic.link}>
-                  <span className="font-medium block mb-2 group-hover:underline">{topic.text}</span>
-                  <ArrowRight className="h-5 w-5 mt-auto self-end opacity-70 group-hover:opacity-100 transition-opacity" />
+                <Link href={topic.link} className="w-full h-full flex flex-col justify-between">
+                  <span className="font-medium text-lg block group-hover:underline whitespace-normal break-words relative z-10">
+                    {topic.text}
+                  </span>
+                  <ArrowRight className="h-6 w-6 mt-auto self-end opacity-80 group-hover:opacity-100 transition-opacity relative z-10" />
                 </Link>
               </Button>
             ))}

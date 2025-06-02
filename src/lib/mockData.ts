@@ -113,10 +113,34 @@ export const mockTools: Tool[] = [
 ];
 
 export const mockQuickTopics: QuickTopic[] = [
-  { id: '1', text: 'Planning to renovate? These tools might suit you.', link: '/equipment?category=home-repair' },
-  { id: '2', text: 'What tools do I need for concrete work?', link: '/blog/guide-concrete-tools' },
-  { id: '3', text: 'Deck building essentials', link: '/blog/deck-building-guide' },
-  { id: '4', text: 'Basic tools for beginners', link: '/equipment?category=basic' },
+  { 
+    id: '1', 
+    text: 'Planning to renovate? These tools might suit you.', 
+    link: '/equipment?category=home-repair',
+    image: 'https://placehold.co/400x200.png',
+    aiHint: 'home renovation'
+  },
+  { 
+    id: '2', 
+    text: 'What tools do I need for concrete work? A comprehensive guide.', 
+    link: '/blog/guide-concrete-tools',
+    image: 'https://placehold.co/400x200.png',
+    aiHint: 'concrete tools'
+  },
+  { 
+    id: '3', 
+    text: 'Deck building essentials for your next outdoor project.', 
+    link: '/blog/deck-building-guide',
+    image: 'https://placehold.co/400x200.png',
+    aiHint: 'deck construction'
+  },
+  { 
+    id: '4', 
+    text: 'Get started with basic tools: A must-have list for beginners.', 
+    link: '/equipment?category=basic',
+    image: 'https://placehold.co/400x200.png',
+    aiHint: 'basic tools'
+  },
 ];
 
 export const mockBlogArticles: BlogArticle[] = [
@@ -206,6 +230,39 @@ export const mockBlogArticles: BlogArticle[] = [
     duration: '1 hour',
     cost: 'Very Low',
     date: '2023-09-20',
+  },
+  {
+    slug: 'installing-shelves-101',
+    title: 'Installing Shelves 101: A Step-by-Step Guide',
+    excerpt: 'Add storage and style to your home by learning how to properly install wall shelves. Perfect for beginners!',
+    thumbnail: 'https://placehold.co/400x250.png',
+    aiHint: 'wall shelves',
+    difficulty: 'Easy',
+    duration: '2 hours',
+    cost: 'Low',
+    date: '2023-11-15',
+  },
+  {
+    slug: 'unclogging-drain-basics',
+    title: 'DIY Drain Unclogging: Simple Fixes Before Calling a Plumber',
+    excerpt: 'Learn basic techniques to unclog common household drains using simple tools and methods.',
+    thumbnail: 'https://placehold.co/400x250.png',
+    aiHint: 'drain pipe',
+    difficulty: 'Easy',
+    duration: '1 hour',
+    cost: 'Very Low',
+    date: '2023-11-20',
+  },
+  {
+    slug: 'hanging-pictures-perfectly',
+    title: 'How to Hang Pictures Perfectly Every Time',
+    excerpt: 'A simple guide to ensure your photos and artwork are hung straight and securely.',
+    thumbnail: 'https://placehold.co/400x250.png',
+    aiHint: 'picture frame wall',
+    difficulty: 'Easy',
+    duration: '30 minutes',
+    cost: 'Very Low',
+    date: '2023-11-25',
   }
 ];
 

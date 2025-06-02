@@ -61,6 +61,8 @@ export interface QuickTopic {
   id: string;
   text: string;
   link: string; // Could be a filtered product list or blog list
+  image?: string; // Added for background image
+  aiHint?: string; // Added for AI hint for the image
 }
 
 export interface CartItem extends Tool {
