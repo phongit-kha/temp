@@ -60,7 +60,7 @@ const Footer = () => {
             <h5 className="font-headline text-lg font-semibold mb-4">Newsletter</h5>
             <p className="text-sm text-muted-foreground mb-3">Subscribe to get updates on new tools and offers.</p>
             <form className="flex space-x-2">
-              <Input type="email" placeholder="Enter your email" className="bg-background flex-1" />
+              <Input type="text" placeholder="Enter your email" className="bg-background flex-1" />
               <Button type="submit" variant="default">Subscribe</Button>
             </form>
           </div>
