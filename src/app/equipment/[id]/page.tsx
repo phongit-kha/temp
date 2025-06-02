@@ -4,6 +4,7 @@
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { useParams, useSearchParams } from 'next/navigation';
+import Link from 'next/link'; // Added import
 import { getToolById, mockTools } from '@/lib/mockData';
 import type { Tool, HowToUseStep } from '@/types';
 import { Button } from '@/components/ui/button';
@@ -132,9 +133,9 @@ const EquipmentDetailsPage = () => {
           </div>
           <div className="grid grid-cols-4 gap-2">
             {[tool.image, ...(tool.specs?.additionalImages || [
-              'https://placehold.co/100x100.png?text=Tool+View', 
-              'https://placehold.co/100x100.png?text=Tool+Angle', 
-              'https://placehold.co/100x100.png?text=Tool+Detail'
+              'https://placehold.co/100x100.png?text=Tool+View+1', 
+              'https://placehold.co/100x100.png?text=Tool+View+2', 
+              'https://placehold.co/100x100.png?text=Tool+View+3'
             ])].slice(0,4).map((imgUrl, idx) => (
               <button
                 key={idx}
@@ -245,8 +246,10 @@ const EquipmentDetailsPage = () => {
             {tool.stock === 0 && <p className="text-xs text-center mt-2 text-destructive font-medium">Out of stock</p>}
             {isPurchaseCheaper && rentalDays > 0 && <p className="text-xs text-center mt-2 text-green-600 font-medium">Buying is cheaper for this rental period and quantity!</p>}
           </div>
-          <Button variant="outline" className="w-full">
-            <PlusCircle className="mr-2 h-5 w-5" /> Add to Compare
+          <Button variant="outline" className="w-full" asChild>
+            <Link href={`/compare?products=${tool.id}`}>
+              <PlusCircle className="mr-2 h-5 w-5" /> Add to Compare
+            </Link>
           </Button>
         </div>
       </div>
