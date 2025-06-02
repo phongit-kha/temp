@@ -52,6 +52,13 @@ const Navbar = () => {
         </nav>
 
         <div className="flex items-center space-x-3">
+          <Button variant="ghost" size="icon" asChild>
+            <Link href="/cart" aria-label="View Cart">
+              <ShoppingCart className="h-5 w-5" />
+              <span className="sr-only">Cart</span>
+            </Link>
+          </Button>
+          
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="relative h-8 w-8 rounded-full">

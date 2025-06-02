@@ -13,7 +13,6 @@ export const NAV_LINKS = [
 export const USER_MENU_LINKS = [
   { href: "/login", label: "Login" },
   { href: "/profile", label: "Profile" },
-  { href: "/cart", label: "Cart" },
 ];
 
 export const FOOTER_LINKS = {
