@@ -13,7 +13,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
-import { Card, CardContent } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { CalendarIcon, ChevronLeft, ChevronRight, AlertTriangle, ShoppingCart, Tag, PlusCircle, Star, Minus, Plus } from 'lucide-react';
 import { format } from "date-fns";
 import ProductCard from '@/components/shared/ProductCard';
@@ -108,19 +108,21 @@ const EquipmentDetailsPage = () => {
 
   const handleHowToStepClick = (stepId: string) => {
     setActiveHowToStep(stepId);
-    const element = document.getElementById(`how-to-content-${stepId}`);
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-    }
   };
   
   const currentStepIndex = tool.howToUseSteps?.findIndex(step => step.id === activeHowToStep) ?? -1;
+  const currentStepData = tool.howToUseSteps && currentStepIndex !== -1 ? tool.howToUseSteps[currentStepIndex] : null;
 
   const navigateStep = (direction: 'prev' | 'next') => {
     if (!tool.howToUseSteps) return;
-    const newIndex = direction === 'prev' ? currentStepIndex - 1 : currentStepIndex + 1;
-    if (newIndex >= 0 && newIndex < tool.howToUseSteps.length) {
-      handleHowToStepClick(tool.howToUseSteps[newIndex].id);
+    let newIndex = currentStepIndex;
+    if (direction === 'prev') {
+      newIndex = Math.max(0, currentStepIndex - 1);
+    } else {
+      newIndex = Math.min(tool.howToUseSteps.length - 1, currentStepIndex + 1);
+    }
+    if (newIndex !== currentStepIndex && tool.howToUseSteps[newIndex]) {
+      setActiveHowToStep(tool.howToUseSteps[newIndex].id);
     }
   };
 
@@ -298,44 +300,48 @@ const EquipmentDetailsPage = () => {
         </TabsContent>
         <TabsContent value="how-to-use">
           {tool.howToUseSteps && tool.howToUseSteps.length > 0 ? (
-            <div className="grid lg:grid-cols-[300px_1fr] gap-8">
-              {/* TOC */}
-              <aside className="border rounded-lg p-4 lg:sticky lg:top-24 h-fit max-h-[calc(100vh-10rem)] overflow-y-auto">
-                <h3 className="text-lg font-semibold mb-3 font-headline">Table of Contents</h3>
-                <ul className="space-y-1">
-                  {tool.howToUseSteps.map((step, index) => (
-                    <li key={step.id}>
-                      <button
-                        onClick={() => handleHowToStepClick(step.id)}
-                        className={`w-full text-left px-3 py-2 rounded-md text-sm transition-colors ${activeHowToStep === step.id ? 'bg-accent text-accent-foreground font-medium' : 'hover:bg-muted/50'}`}
-                      >
-                        {index + 1}. {step.title}
-                      </button>
-                    </li>
-                  ))}
-                </ul>
-              </aside>
-              {/* Content Area */}
-              <div className="space-y-8">
-                {tool.howToUseSteps.map((step: HowToUseStep, index) => (
-                  <Card key={step.id} id={`how-to-content-${step.id}`} className={`${activeHowToStep === step.id ? 'ring-2 ring-primary' : ''}`}>
-                    <CardContent className="p-6">
-                      <h4 className="text-xl font-semibold mb-3 font-headline">{index + 1}. {step.title}</h4>
-                      <div className="relative aspect-video rounded-md overflow-hidden mb-4">
-                        <Image src={step.mediaUrl} alt={`Step ${index + 1}: ${step.title}`} layout="fill" objectFit="cover" data-ai-hint={step.aiHint || "tutorial image"} />
-                      </div>
-                      <p className="text-foreground/80 leading-relaxed">{step.description}</p>
-                    </CardContent>
-                  </Card>
+            <div className="space-y-6">
+              {/* Timeline Navigation */}
+              <div className="flex items-center justify-center space-x-2 sm:space-x-4 overflow-x-auto pb-2">
+                {tool.howToUseSteps.map((step, index) => (
+                  <Button
+                    key={step.id}
+                    variant={activeHowToStep === step.id ? "default" : "outline"}
+                    size="sm"
+                    className={cn(
+                      "rounded-full h-10 w-10 sm:h-12 sm:w-12 flex-shrink-0 p-0 text-base sm:text-lg",
+                      activeHowToStep === step.id && "ring-2 ring-offset-2 ring-primary"
+                    )}
+                    onClick={() => handleHowToStepClick(step.id)}
+                  >
+                    {index + 1}
+                  </Button>
                 ))}
-                <div className="flex justify-between mt-8">
-                  <Button onClick={() => navigateStep('prev')} disabled={currentStepIndex <= 0} variant="outline">
-                    <ChevronLeft className="mr-2 h-4 w-4" /> Previous Step
-                  </Button>
-                  <Button onClick={() => navigateStep('next')} disabled={currentStepIndex >= (tool.howToUseSteps?.length ?? 0) -1} variant="outline">
-                    Next Step <ChevronRight className="ml-2 h-4 w-4" />
-                  </Button>
-                </div>
+              </div>
+
+              {/* Carousel Content */}
+              {currentStepData && (
+                <Card className="overflow-hidden shadow-lg">
+                   <CardHeader className="p-4 sm:p-6 text-center bg-secondary">
+                    <CardTitle className="text-xl sm:text-2xl font-headline">{currentStepData.title}</CardTitle>
+                  </CardHeader>
+                  <CardContent className="p-4 sm:p-6 space-y-4">
+                    <div className="relative aspect-video rounded-md overflow-hidden border">
+                      <Image src={currentStepData.mediaUrl} alt={`Step ${currentStepIndex + 1}: ${currentStepData.title}`} layout="fill" objectFit="cover" data-ai-hint={currentStepData.aiHint || "tutorial image"} />
+                    </div>
+                    <p className="text-foreground/80 leading-relaxed text-sm sm:text-base">{currentStepData.description}</p>
+                  </CardContent>
+                </Card>
+              )}
+              
+              {/* Carousel Navigation */}
+              <div className="flex justify-between mt-4">
+                <Button onClick={() => navigateStep('prev')} disabled={currentStepIndex <= 0} variant="outline">
+                  <ChevronLeft className="mr-2 h-4 w-4" /> Previous Step
+                </Button>
+                <Button onClick={() => navigateStep('next')} disabled={currentStepIndex >= (tool.howToUseSteps?.length ?? 0) -1} variant="outline">
+                  Next Step <ChevronRight className="ml-2 h-4 w-4" />
+                </Button>
               </div>
             </div>
           ) : (
@@ -348,3 +354,5 @@ const EquipmentDetailsPage = () => {
 };
 
 export default EquipmentDetailsPage;
+
+        
