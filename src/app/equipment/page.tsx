@@ -1,7 +1,9 @@
+
 'use client';
 
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
+import Link from 'next/link';
 import ProductCard from '@/components/shared/ProductCard';
 import { mockTools, mockCategories } from '@/lib/mockData';
 import type { Tool, CategoryInfo } from '@/types';
@@ -12,17 +14,23 @@ import { Slider } from '@/components/ui/slider';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
-import { ListFilter, LayoutGrid, LayoutList } from 'lucide-react';
+import { Card, CardContent } from '@/components/ui/card'; // Added Card and CardContent
+import { ListFilter, LayoutGrid, LayoutList, GitCompareArrows } from 'lucide-react'; // Added GitCompareArrows
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import { useToast } from '@/hooks/use-toast'; // Added useToast
+
+const MAX_COMPARE_ITEMS = 4;
 
 const EquipmentListPage = () => {
   const searchParams = useSearchParams();
+  const { toast } = useToast();
   const [filteredTools, setFilteredTools] = useState<Tool[]>(mockTools);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 5000]);
   const [rentalDuration, setRentalDuration] = useState<string>('any');
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [layout, setLayout] = useState<'grid' | 'list'>('grid');
+  const [selectedCompareIds, setSelectedCompareIds] = useState<string[]>([]);
   
   useEffect(() => {
     const initialCategory = searchParams.get('category');
@@ -44,9 +52,6 @@ const EquipmentListPage = () => {
 
     tools = tools.filter(tool => tool.priceRent >= priceRange[0] && tool.priceRent <= priceRange[1]);
 
-    // Rental duration filtering logic would go here if we had specific durations per tool
-    // For now, it's a placeholder
-
     setFilteredTools(tools);
   }, [selectedCategories, priceRange, rentalDuration, searchTerm]);
 
@@ -54,6 +59,27 @@ const EquipmentListPage = () => {
     setSelectedCategories(prev =>
       prev.includes(categoryId) ? prev.filter(c => c !== categoryId) : [...prev, categoryId]
     );
+  };
+
+  const handleToggleCompareItem = (toolId: string) => {
+    setSelectedCompareIds(prevIds => {
+      if (prevIds.includes(toolId)) {
+        toast({ title: "Removed from Compare", description: `${mockTools.find(t=>t.id === toolId)?.name} removed from comparison.` });
+        return prevIds.filter(id => id !== toolId);
+      } else {
+        if (prevIds.length < MAX_COMPARE_ITEMS) {
+          toast({ title: "Added to Compare", description: `${mockTools.find(t=>t.id === toolId)?.name} added for comparison.` });
+          return [...prevIds, toolId];
+        } else {
+          toast({
+            title: "Comparison Limit Reached",
+            description: `You can only select up to ${MAX_COMPARE_ITEMS} tools for comparison.`,
+            variant: "destructive",
+          });
+          return prevIds;
+        }
+      }
+    });
   };
 
   const FilterPanelContent = () => (
@@ -109,7 +135,7 @@ const EquipmentListPage = () => {
                 <SelectItem value="1day">1 Day</SelectItem>
                 <SelectItem value="3days">3 Days</SelectItem>
                 <SelectItem value="1week">1 Week</SelectItem>
-                <SelectItem value="custom">Custom</SelectItem>
+                <SelectItem value="custom">Custom</SelectItem> {/* Consider how custom duration would work */}
               </SelectContent>
             </Select>
           </AccordionContent>
@@ -120,6 +146,7 @@ const EquipmentListPage = () => {
         setPriceRange([0, 5000]);
         setRentalDuration('any');
         setSearchTerm('');
+        setSelectedCompareIds([]); // Clear compare list too
       }} variant="outline" className="w-full">Clear Filters</Button>
     </div>
   );
@@ -158,10 +185,31 @@ const EquipmentListPage = () => {
             </div>
           </div>
 
+          {selectedCompareIds.length > 0 && (
+            <Card className="mb-6 shadow-md">
+              <CardContent className="p-4 flex flex-col sm:flex-row justify-between items-center gap-3">
+                <p className="font-medium text-sm text-foreground">
+                  {selectedCompareIds.length} / {MAX_COMPARE_ITEMS} tools selected for comparison.
+                </p>
+                <Button asChild>
+                  <Link href={`/compare?products=${selectedCompareIds.join(',')}`}>
+                    <GitCompareArrows className="mr-2 h-4 w-4" /> Compare Selected
+                  </Link>
+                </Button>
+              </CardContent>
+            </Card>
+          )}
+
           {filteredTools.length > 0 ? (
             <div className={`grid gap-6 ${layout === 'grid' ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3' : 'grid-cols-1'}`}>
               {filteredTools.map(tool => (
-                <ProductCard key={tool.id} tool={tool} layout={layout === 'list' ? 'horizontal' : 'vertical'} />
+                <ProductCard 
+                  key={tool.id} 
+                  tool={tool} 
+                  layout={layout === 'list' ? 'horizontal' : 'vertical'}
+                  onToggleCompare={handleToggleCompareItem}
+                  isSelectedForCompare={selectedCompareIds.includes(tool.id)}
+                />
               ))}
             </div>
           ) : (

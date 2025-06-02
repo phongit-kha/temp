@@ -4,14 +4,16 @@ import type { Tool } from '@/types';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Eye, ShoppingCart, Tag } from 'lucide-react';
+import { Eye, ShoppingCart, Tag, PlusCircle, CheckCircle } from 'lucide-react';
 
 interface ProductCardProps {
   tool: Tool;
   layout?: 'vertical' | 'horizontal'; // For different listing styles
+  onToggleCompare?: (toolId: string) => void;
+  isSelectedForCompare?: boolean;
 }
 
-const ProductCard: React.FC<ProductCardProps> = ({ tool, layout = 'vertical' }) => {
+const ProductCard: React.FC<ProductCardProps> = ({ tool, layout = 'vertical', onToggleCompare, isSelectedForCompare }) => {
   const stockColor = tool.stock <= (tool.lowStockThreshold ?? 2) ? 'text-red-600' : 'text-green-600';
   const isLowStock = tool.stock <= (tool.lowStockThreshold ?? 2);
 
@@ -43,19 +45,31 @@ const ProductCard: React.FC<ProductCardProps> = ({ tool, layout = 'vertical' }) 
           </p>
         </CardContent>
       </Link>
-      <CardFooter className="p-4 pt-0 flex flex-col sm:flex-row gap-2 items-stretch sm:items-center">
-        {tool.priceBuy && (
-          <Button variant="outline" className="w-full sm:w-auto flex-1" asChild>
-            <Link href={`/equipment/${tool.id}?action=buy`}>
-              <Tag className="mr-2 h-4 w-4" /> Buy: ฿{tool.priceBuy.toLocaleString()}
+      <CardFooter className="p-4 pt-2 flex flex-col gap-2">
+        <div className="flex flex-col sm:flex-row gap-2">
+          {tool.priceBuy && (
+            <Button variant="outline" className="w-full sm:w-auto flex-1" asChild>
+              <Link href={`/equipment/${tool.id}?action=buy`}>
+                <Tag className="mr-2 h-4 w-4" /> Buy: ฿{tool.priceBuy.toLocaleString()}
+              </Link>
+            </Button>
+          )}
+          <Button variant="default" className="w-full sm:w-auto flex-1" asChild>
+             <Link href={`/equipment/${tool.id}?action=rent`}>
+              <ShoppingCart className="mr-2 h-4 w-4" /> Rent: ฿{tool.priceRent.toLocaleString()}
             </Link>
           </Button>
+        </div>
+        {onToggleCompare && typeof isSelectedForCompare === 'boolean' && (
+          <Button
+            variant={isSelectedForCompare ? "default" : "outline"}
+            className="w-full"
+            onClick={() => onToggleCompare(tool.id)}
+          >
+            {isSelectedForCompare ? <CheckCircle className="mr-2 h-4 w-4" /> : <PlusCircle className="mr-2 h-4 w-4" />}
+            {isSelectedForCompare ? "Added to Compare" : "Add to Compare"}
+          </Button>
         )}
-        <Button variant="default" className="w-full sm:w-auto flex-1" asChild>
-           <Link href={`/equipment/${tool.id}?action=rent`}>
-            <ShoppingCart className="mr-2 h-4 w-4" /> Rent: ฿{tool.priceRent.toLocaleString()}
-          </Link>
-        </Button>
       </CardFooter>
     </Card>
   );
