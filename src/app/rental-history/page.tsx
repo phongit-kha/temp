@@ -1,3 +1,4 @@
+
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
@@ -12,7 +13,7 @@ const mockRentalHistory = [
     returnDate: "2023-10-18",
     status: "Returned",
     totalPrice: "฿1500",
-    toolImage: "https://placehold.co/100x100.png",
+    toolImage: "https://placehold.co/100x100.png?text=Drill",
     aiHint: "electric drill"
   },
   {
@@ -22,7 +23,7 @@ const mockRentalHistory = [
     returnDate: "2023-11-03",
     status: "Active",
     totalPrice: "฿600",
-    toolImage: "https://placehold.co/100x100.png",
+    toolImage: "https://placehold.co/100x100.png?text=Laser+Level",
     aiHint: "laser level"
   },
   {
@@ -32,7 +33,7 @@ const mockRentalHistory = [
     returnDate: "2023-11-27",
     status: "Awaiting Return",
     totalPrice: "฿4200",
-    toolImage: "https://placehold.co/100x100.png",
+    toolImage: "https://placehold.co/100x100.png?text=Circular+Saw",
     aiHint: "circular saw"
   }
 ];

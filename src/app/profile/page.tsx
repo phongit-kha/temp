@@ -1,3 +1,4 @@
+
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -14,7 +15,7 @@ export default function ProfilePage() {
     phone: "081-234-5678",
     address: "123 Sukhumvit Road, Bangkok 10110, Thailand",
     memberSince: "January 15, 2023",
-    profilePictureUrl: "https://placehold.co/150x150.png?text=SJ"
+    profilePictureUrl: "https://placehold.co/150x150.png?text=User+Photo"
   };
 
   return (

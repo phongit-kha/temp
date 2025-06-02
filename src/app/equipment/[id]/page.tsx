@@ -75,8 +75,11 @@ const EquipmentDetailsPage = () => {
       } else {
         days = 1; // Default to 1 day if dates are not set correctly for rent
       }
-      rentalDurationString = days === 1 ? '1day' : `${days}days`;
+       // Ensure days is at least 1 if action is rent
+      if (days <= 0 && action === 'rent') days = 1;
+      rentalDurationString = days === 1 ? '1day' : `${days}days`; // Simple duration string
     }
+
 
     cart.addToCart(tool, action, quantity, rentalDurationString);
     
@@ -136,16 +139,16 @@ const EquipmentDetailsPage = () => {
           </div>
           <div className="grid grid-cols-4 gap-2">
             {[tool.image, ...(tool.specs?.additionalImages || [
-              'https://placehold.co/100x100.png?text=Img2', 
-              'https://placehold.co/100x100.png?text=Img3', 
-              'https://placehold.co/100x100.png?text=Img4'
+              'https://placehold.co/100x100.png?text=Tool+View', 
+              'https://placehold.co/100x100.png?text=Tool+Angle', 
+              'https://placehold.co/100x100.png?text=Tool+Detail'
             ])].slice(0,4).map((imgUrl, idx) => (
               <button
                 key={idx}
                 className={`aspect-square rounded-md overflow-hidden border-2 transition-all ${selectedImage === imgUrl ? 'border-primary scale-105' : 'border-transparent hover:border-muted'}`}
                 onClick={() => setSelectedImage(imgUrl)}
               >
-                <Image src={imgUrl} alt={`${tool.name} thumbnail ${idx + 1}`} width={100} height={100} className="object-cover w-full h-full" data-ai-hint={tool.aiHint || "tool thumbnail"} />
+                <Image src={imgUrl} alt={`${tool.name} thumbnail ${idx + 1}`} width={100} height={100} className="object-cover w-full h-full" data-ai-hint="tool thumbnail" />
               </button>
             ))}
           </div>
@@ -242,7 +245,7 @@ const EquipmentDetailsPage = () => {
                 variant={!purchasePrice || (!isPurchaseCheaper && rentalDays > 0) ? "default" : "outline"} 
                 className={`flex-1 ${!isPurchaseCheaper && purchasePrice && rentalDays > 0 ? 'ring-2 ring-offset-2 ring-primary transform scale-105' : ''}`}
                 onClick={() => handleAddToCart('rent')}
-                disabled={tool.stock === 0 || rentalDays <= 0}
+                disabled={tool.stock === 0 || (action === 'rent' && rentalDays <= 0)}
               >
                 <ShoppingCart className="mr-2 h-5 w-5" /> 
                 {rentalDays > 0 ? `Rent (฿${totalRentalPrice.toLocaleString()})` : `Rent: ฿${(rentPricePerDay * quantity).toLocaleString()}/day`}
@@ -354,5 +357,3 @@ const EquipmentDetailsPage = () => {
 };
 
 export default EquipmentDetailsPage;
-
-        

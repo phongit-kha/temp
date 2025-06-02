@@ -116,7 +116,7 @@ export default function HomePage() {
       {/* Hero Section */}
       <section className="relative h-[60vh] min-h-[400px] flex items-center justify-center bg-secondary text-secondary-foreground">
         <Image
-          src="https://placehold.co/1920x1080.png"
+          src="https://placehold.co/1920x1080.png?text=Tools+Workshop"
           alt="Workshop background"
           layout="fill"
           objectFit="cover"
@@ -187,11 +187,11 @@ export default function HomePage() {
                 variant="outline"
                 className="relative h-48 text-primary-foreground p-4 text-left flex flex-col justify-between items-start group overflow-hidden focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 rounded-md"
                 style={{
-                  backgroundImage: `linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.2) 40%, rgba(0,0,0,0.7) 100%), url(${topic.image || 'https://placehold.co/400x200.png'})`,
+                  backgroundImage: `linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.2) 40%, rgba(0,0,0,0.7) 100%), url(${topic.image || 'https://placehold.co/400x200.png?text=Topic'})`,
                   backgroundSize: 'cover',
                   backgroundPosition: 'center',
-                  borderWidth: '1px', // Explicitly set border width if variant outline is not enough or overridden
-                  borderColor: 'hsl(var(--border))', // Use theme variable for border
+                  borderWidth: '1px', 
+                  borderColor: 'hsl(var(--border))', 
                 }}
                 asChild
                 data-ai-hint={topic.aiHint || 'topic background'}
