@@ -12,28 +12,32 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
-import { CalendarIcon, ChevronLeft, ChevronRight, AlertTriangle, ShoppingCart, Tag, PlusCircle, Star } from 'lucide-react';
+import { CalendarIcon, ChevronLeft, ChevronRight, AlertTriangle, ShoppingCart, Tag, PlusCircle, Star, Minus, Plus } from 'lucide-react';
 import { format } from "date-fns";
 import ProductCard from '@/components/shared/ProductCard';
 import { cn } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
+import { useCart } from '@/contexts/CartContext';
 
 const EquipmentDetailsPage = () => {
   const params = useParams();
   const searchParamsHook = useSearchParams();
   const id = params.id as string;
   const { toast } = useToast();
+  const cart = useCart();
   
   const [tool, setTool] = useState<Tool | null>(null);
   const [selectedImage, setSelectedImage] = useState<string>('');
   const [rentalStartDate, setRentalStartDate] = useState<Date | undefined>(new Date());
   const [rentalEndDate, setRentalEndDate] = useState<Date | undefined>(() => {
     const date = new Date();
-    date.setDate(date.getDate() + 1);
+    date.setDate(date.getDate() + 1); // Default to 1 day rental initially
     return date;
   });
   const [activeHowToStep, setActiveHowToStep] = useState<string | null>(null);
+  const [quantity, setQuantity] = useState<number>(1);
 
   useEffect(() => {
     if (id) {
@@ -44,6 +48,7 @@ const EquipmentDetailsPage = () => {
         if (fetchedTool.howToUseSteps && fetchedTool.howToUseSteps.length > 0) {
           setActiveHowToStep(fetchedTool.howToUseSteps[0].id);
         }
+        setQuantity(1); // Reset quantity when tool changes
       }
     }
     
@@ -51,18 +56,33 @@ const EquipmentDetailsPage = () => {
     // Further logic can be added here if specific action (buy/rent) from ProductCard needs handling
   }, [id, searchParamsHook]);
 
+  const handleQuantityChange = (newQuantity: number) => {
+    if (!tool) return;
+    const stock = tool.stock || 0;
+    if (newQuantity >= 1 && newQuantity <= stock) {
+      setQuantity(newQuantity);
+    }
+  };
+
   const handleAddToCart = (action: 'rent' | 'buy') => {
     if (!tool) return;
-    // Simulate adding to cart
-    let durationMessage = '';
+
+    let rentalDurationString = 'N/A';
+    let days = 0;
     if (action === 'rent') {
-      const days = rentalDays > 0 ? rentalDays : 1; // Default to 1 day if not properly calculated
-      durationMessage = ` for ${days} day(s)`;
+      if (rentalStartDate && rentalEndDate && rentalEndDate > rentalStartDate) {
+        days = Math.ceil((rentalEndDate.getTime() - rentalStartDate.getTime()) / (1000 * 3600 * 24));
+      } else {
+        days = 1; // Default to 1 day if dates are not set correctly for rent
+      }
+      rentalDurationString = days === 1 ? '1day' : `${days}days`;
     }
-    console.log(`Adding ${tool.name} to cart for ${action}${durationMessage}.`);
+
+    cart.addToCart(tool, action, quantity, rentalDurationString);
+    
     toast({
       title: "Added to Cart!",
-      description: `${tool.name} has been added to your cart for ${action}.`,
+      description: `${tool.name} (x${quantity}) has been added to your cart for ${action}${action === 'rent' ? ` (${days} day${days !==1 ? 's':''})` : ''}.`,
     });
   };
 
@@ -79,8 +99,10 @@ const EquipmentDetailsPage = () => {
   if (rentalStartDate && rentalEndDate && rentalEndDate > rentalStartDate) {
     rentalDays = Math.ceil((rentalEndDate.getTime() - rentalStartDate.getTime()) / (1000 * 3600 * 24));
   }
-  const totalRentalPrice = rentalDays * rentPricePerDay;
-  const isPurchaseCheaper = purchasePrice && totalRentalPrice > 0 ? purchasePrice < totalRentalPrice : false;
+  const totalRentalPrice = rentalDays * rentPricePerDay * quantity;
+  const totalPurchasePrice = purchasePrice ? purchasePrice * quantity : 0;
+  const isPurchaseCheaper = purchasePrice && totalRentalPrice > 0 && rentalDays > 0 ? totalPurchasePrice < totalRentalPrice : false;
+
 
   const recommendedProducts = mockTools.filter(t => t.id !== tool.id && t.categories.some(cat => tool.categories.includes(cat))).slice(0, 4);
 
@@ -186,6 +208,20 @@ const EquipmentDetailsPage = () => {
              {rentalDays > 0 && (
               <p className="text-sm text-center text-muted-foreground mb-3">Selected rental period: {rentalDays} day{rentalDays > 1 ? 's' : ''}</p>
             )}
+            
+            <div className="mb-4">
+              <Label htmlFor="quantity" className="text-xs">Quantity</Label>
+              <div className="flex items-center space-x-2 mt-1">
+                <Button variant="outline" size="icon" className="h-9 w-9" onClick={() => handleQuantityChange(quantity - 1)} disabled={quantity <= 1}>
+                  <Minus className="h-4 w-4" />
+                </Button>
+                <Input id="quantity" type="number" value={quantity} readOnly className="h-9 w-14 text-center px-1" />
+                <Button variant="outline" size="icon" className="h-9 w-9" onClick={() => handleQuantityChange(quantity + 1)} disabled={quantity >= tool.stock}>
+                  <Plus className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+
 
             <div className="flex flex-col sm:flex-row gap-3">
               {purchasePrice && (
@@ -194,20 +230,24 @@ const EquipmentDetailsPage = () => {
                   variant={isPurchaseCheaper ? "default" : "outline"} 
                   className={`flex-1 ${isPurchaseCheaper ? 'ring-2 ring-offset-2 ring-primary transform scale-105' : ''}`}
                   onClick={() => handleAddToCart('buy')}
+                  disabled={tool.stock === 0}
                 >
-                  <Tag className="mr-2 h-5 w-5" /> Buy: ฿{purchasePrice.toLocaleString()}
+                  <Tag className="mr-2 h-5 w-5" /> Buy: ฿{(totalPurchasePrice).toLocaleString()}
                 </Button>
               )}
               <Button 
                 size="lg" 
-                variant={!purchasePrice || !isPurchaseCheaper ? "default" : "outline"} 
-                className={`flex-1 ${!isPurchaseCheaper && purchasePrice ? 'ring-2 ring-offset-2 ring-primary transform scale-105' : ''}`}
+                variant={!purchasePrice || (!isPurchaseCheaper && rentalDays > 0) ? "default" : "outline"} 
+                className={`flex-1 ${!isPurchaseCheaper && purchasePrice && rentalDays > 0 ? 'ring-2 ring-offset-2 ring-primary transform scale-105' : ''}`}
                 onClick={() => handleAddToCart('rent')}
+                disabled={tool.stock === 0 || rentalDays <= 0}
               >
-                <ShoppingCart className="mr-2 h-5 w-5" /> Rent{rentalDays > 0 ? ` (฿${totalRentalPrice.toLocaleString()})` : `: ฿${rentPricePerDay.toLocaleString()}/day`}
+                <ShoppingCart className="mr-2 h-5 w-5" /> 
+                {rentalDays > 0 ? `Rent (฿${totalRentalPrice.toLocaleString()})` : `Rent: ฿${(rentPricePerDay * quantity).toLocaleString()}/day`}
               </Button>
             </div>
-            {isPurchaseCheaper && <p className="text-xs text-center mt-2 text-green-600 font-medium">Buying is cheaper for this rental period!</p>}
+            {tool.stock === 0 && <p className="text-xs text-center mt-2 text-destructive font-medium">Out of stock</p>}
+            {isPurchaseCheaper && rentalDays > 0 && <p className="text-xs text-center mt-2 text-green-600 font-medium">Buying is cheaper for this rental period and quantity!</p>}
           </div>
           <Button variant="outline" className="w-full">
             <PlusCircle className="mr-2 h-5 w-5" /> Add to Compare
@@ -248,7 +288,7 @@ const EquipmentDetailsPage = () => {
                   {Object.entries(tool.specs || { Brand: tool.brand, Weight: tool.weight, Power: tool.power, Warranty: tool.warranty }).filter(([_, val]) => val).map(([key, value]) => (
                     <div key={key} className="flex justify-between text-sm border-b pb-1">
                       <span className="font-medium text-foreground/70">{key.replace(/([A-Z])/g, ' $1').trim()}:</span>
-                      <span className="text-foreground/90">{value}</span>
+                      <span className="text-foreground/90">{String(value)}</span>
                     </div>
                   ))}
                 </div>
