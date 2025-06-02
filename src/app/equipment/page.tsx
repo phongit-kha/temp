@@ -14,10 +14,10 @@ import { Slider } from '@/components/ui/slider';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
-import { Card, CardContent } from '@/components/ui/card'; // Added Card and CardContent
-import { ListFilter, LayoutGrid, LayoutList, GitCompareArrows } from 'lucide-react'; // Added GitCompareArrows
+import { Card, CardContent } from '@/components/ui/card';
+import { ListFilter, LayoutGrid, LayoutList, GitCompareArrows } from 'lucide-react';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
-import { useToast } from '@/hooks/use-toast'; // Added useToast
+import { useToast } from '@/hooks/use-toast';
 
 const MAX_COMPARE_ITEMS = 4;
 
@@ -37,6 +37,10 @@ const EquipmentListPage = () => {
     if (initialCategory) {
       setSelectedCategories([initialCategory]);
     }
+    const initialSearchTerm = searchParams.get('search');
+    if (initialSearchTerm) {
+      setSearchTerm(initialSearchTerm);
+    }
   }, [searchParams]);
 
   useEffect(() => {
@@ -51,6 +55,9 @@ const EquipmentListPage = () => {
     }
 
     tools = tools.filter(tool => tool.priceRent >= priceRange[0] && tool.priceRent <= priceRange[1]);
+
+    // Note: rentalDuration filter is not fully implemented in this effect as its logic can be complex (e.g., matching against tool availability for specific durations).
+    // For now, it's a state placeholder.
 
     setFilteredTools(tools);
   }, [selectedCategories, priceRange, rentalDuration, searchTerm]);
@@ -228,3 +235,4 @@ const EquipmentListPage = () => {
 };
 
 export default EquipmentListPage;
+
