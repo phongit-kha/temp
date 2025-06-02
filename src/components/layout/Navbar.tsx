@@ -1,3 +1,4 @@
+
 'use client';
 
 import Link from 'next/link';
@@ -15,9 +16,11 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useCart } from '@/contexts/CartContext'; // Import useCart
 
 const Navbar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const { cartItems } = useCart(); // Consume CartContext
 
   const commonLinkClasses = "text-sm font-medium transition-colors hover:text-primary";
   const mobileLinkClasses = "block px-4 py-2 text-base hover:bg-accent";
@@ -30,6 +33,8 @@ const Navbar = () => {
     "Help Center": <HelpCircle className="mr-2 h-4 w-4" />,
     "AI Tool Suggester": <Settings className="mr-2 h-4 w-4" />,
   };
+
+  const cartItemCount = cartItems.reduce((count, item) => count + item.quantity, 0);
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -52,9 +57,14 @@ const Navbar = () => {
         </nav>
 
         <div className="flex items-center space-x-3">
-          <Button variant="ghost" size="icon" asChild>
+          <Button variant="ghost" size="icon" asChild className="relative">
             <Link href="/cart" aria-label="View Cart">
               <ShoppingCart className="h-5 w-5" />
+              {cartItemCount > 0 && (
+                <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-xs font-bold text-primary-foreground">
+                  {cartItemCount}
+                </span>
+              )}
               <span className="sr-only">Cart</span>
             </Link>
           </Button>

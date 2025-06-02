@@ -1,7 +1,9 @@
+
 import type { Metadata } from 'next';
 import './globals.css';
 import { Toaster } from "@/components/ui/toaster";
-import AppLayout from '@/components/layout/AppLayout'; // Assuming AppLayout will wrap children
+import AppLayout from '@/components/layout/AppLayout';
+import { CartProvider } from '@/contexts/CartContext'; // Added CartProvider import
 
 export const metadata: Metadata = {
   title: 'Chang Chao - Online Tool Rentals',
@@ -22,9 +24,11 @@ export default function RootLayout({
         <link href="https://fonts.googleapis.com/css2?family=Source+Code+Pro:wght@400;500&display=swap" rel="stylesheet" />
       </head>
       <body className="font-body antialiased" suppressHydrationWarning={true}>
-        <AppLayout>
-          {children}
-        </AppLayout>
+        <CartProvider> {/* Wrapped AppLayout with CartProvider */}
+          <AppLayout>
+            {children}
+          </AppLayout>
+        </CartProvider>
         <Toaster />
       </body>
     </html>
