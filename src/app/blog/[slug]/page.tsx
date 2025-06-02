@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useRef } from 'react';
 import Image from 'next/image';
+import Link from 'next/link'; // Added import
 import { useParams } from 'next/navigation';
 import { getBlogArticleBySlug, mockTools } from '@/lib/mockData';
 import type { BlogArticle, Tool } from '@/types';
