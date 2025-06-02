@@ -1,15 +1,113 @@
+'use client';
+
 import Image from 'next/image';
 import Link from 'next/link';
+import { useState, useEffect, useRef, type FormEvent } from 'react';
+import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import ProductCard from '@/components/shared/ProductCard';
 import { mockCategories, mockTools, mockQuickTopics, beginnerAdviceArticles, mockBlogArticles } from '@/lib/mockData';
-import { ArrowRight, Search as SearchIcon } from 'lucide-react';
+import { ArrowRight, Search as SearchIcon, Package, BookOpen } from 'lucide-react';
 import BlogCard from '@/components/shared/BlogCard';
+import type { Tool as ToolType, BlogArticle as BlogArticleType, QuickTopic as QuickTopicType } from '@/types';
 
+interface Suggestion {
+  id: string;
+  label: string;
+  type: 'product' | 'blog' | 'topic';
+  href: string;
+  icon: React.ElementType;
+}
 
 export default function HomePage() {
+  const router = useRouter();
+  const [searchTerm, setSearchTerm] = useState('');
+  const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
+  const [suggestionsVisible, setSuggestionsVisible] = useState(false);
+  const searchContainerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (searchTerm.length > 1) {
+      const lowerSearchTerm = searchTerm.toLowerCase();
+      
+      const productSuggestions: Suggestion[] = mockTools
+        .filter(tool => tool.name.toLowerCase().includes(lowerSearchTerm))
+        .slice(0, 3)
+        .map(tool => ({
+          id: `product-${tool.id}`,
+          label: tool.name,
+          type: 'product',
+          href: `/equipment/${tool.id}`,
+          icon: Package,
+        }));
+
+      const blogSuggestions: Suggestion[] = mockBlogArticles
+        .filter(article => 
+          article.title.toLowerCase().includes(lowerSearchTerm) ||
+          article.excerpt.toLowerCase().includes(lowerSearchTerm)
+        )
+        .slice(0, 2)
+        .map(article => ({
+          id: `blog-${article.slug}`,
+          label: article.title,
+          type: 'blog',
+          href: `/blog/${article.slug}`,
+          icon: BookOpen,
+        }));
+      
+      const topicSuggestions: Suggestion[] = mockQuickTopics
+        .filter(topic => topic.text.toLowerCase().includes(lowerSearchTerm))
+        .slice(0, 2)
+        .map(topic => ({
+          id: `topic-${topic.id}`,
+          label: topic.text,
+          type: 'topic',
+          href: topic.link,
+          icon: BookOpen,
+        }));
+      
+      const combinedSuggestions = [...productSuggestions, ...blogSuggestions, ...topicSuggestions];
+      // Basic duplicate removal by href, preferring products, then blogs, then topics
+      const uniqueSuggestions = Array.from(new Map(combinedSuggestions.map(s => [s.href, s])).values());
+      
+      setSuggestions(uniqueSuggestions.slice(0, 7));
+      if (uniqueSuggestions.length > 0) {
+        setSuggestionsVisible(true);
+      } else {
+        setSuggestionsVisible(false);
+      }
+    } else {
+      setSuggestions([]);
+      setSuggestionsVisible(false);
+    }
+  }, [searchTerm]);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (searchContainerRef.current && !searchContainerRef.current.contains(event.target as Node)) {
+        setSuggestionsVisible(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
+  const handleSearchSubmit = (e: FormEvent) => {
+    e.preventDefault();
+    if (searchTerm.trim()) {
+      router.push(`/equipment?search=${encodeURIComponent(searchTerm.trim())}`);
+      setSuggestionsVisible(false);
+    }
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(e.target.value);
+  };
+
   return (
     <div className="flex flex-col min-h-screen">
       {/* Hero Section */}
@@ -30,17 +128,49 @@ export default function HomePage() {
           <p className="text-lg md:text-xl mb-8 max-w-2xl mx-auto">
             ช่างเช่า - Your trusted partner for professional tool rentals.
           </p>
-          <div className="max-w-xl mx-auto flex">
-            <Input
-              type="search"
-              placeholder="Search tools or tool usage (e.g., 'drill', 'how to fix sink')"
-              className="text-base md:text-lg h-14 rounded-r-none focus:ring-0 focus:border-primary border-primary"
-            />
-            <Button type="submit" size="lg" className="h-14 rounded-l-none px-8">
-              <SearchIcon className="h-5 w-5 mr-2" />
-              Search Now
-            </Button>
-          </div>
+          <form onSubmit={handleSearchSubmit} className="max-w-xl mx-auto">
+            <div ref={searchContainerRef} className="flex relative">
+              <div className="relative flex-grow">
+                <Input
+                  type="search"
+                  placeholder="Search tools or topics (e.g., 'drill', 'deck building')"
+                  className="text-base md:text-lg h-14 rounded-r-none focus:ring-0 focus:border-primary border-primary"
+                  value={searchTerm}
+                  onChange={handleInputChange}
+                  onFocus={() => searchTerm && suggestions.length > 0 && setSuggestionsVisible(true)}
+                  aria-autocomplete="list"
+                  aria-expanded={suggestionsVisible && suggestions.length > 0}
+                />
+                {suggestionsVisible && suggestions.length > 0 && (
+                  <div className="absolute top-full left-0 right-0 mt-1 z-20 bg-card text-card-foreground border border-border rounded-md shadow-lg p-2 space-y-1">
+                    {suggestions.map((suggestion) => (
+                      <Link
+                        key={suggestion.id}
+                        href={suggestion.href}
+                        className="block hover:bg-accent rounded-md"
+                        onClick={() => {
+                          setSearchTerm(''); // Clear search term after selection
+                          setSuggestionsVisible(false);
+                        }}
+                      >
+                        <div className="flex items-center p-2">
+                          <suggestion.icon className="mr-3 h-5 w-5 text-muted-foreground flex-shrink-0" />
+                          <span className="flex-grow text-sm truncate" title={suggestion.label}>{suggestion.label}</span>
+                          <span className="text-xs text-muted-foreground ml-2 capitalize">
+                            ({suggestion.type === 'product' ? 'Tool' : 'Guide'})
+                          </span>
+                        </div>
+                      </Link>
+                    ))}
+                  </div>
+                )}
+              </div>
+              <Button type="submit" size="lg" className="h-14 rounded-l-none px-8">
+                <SearchIcon className="h-5 w-5 mr-2" />
+                Search Now
+              </Button>
+            </div>
+          </form>
         </div>
       </section>
 
@@ -115,7 +245,7 @@ export default function HomePage() {
             </Button>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {mockTools.slice(0, 8).map((tool) => ( // Show more tools here
+            {mockTools.slice(0, 8).map((tool) => ( 
               <ProductCard key={tool.id} tool={tool} />
             ))}
           </div>

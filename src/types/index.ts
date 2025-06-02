@@ -22,6 +22,7 @@ export interface Tool {
   specs?: { [key: string]: string };
   howToUseSteps?: HowToUseStep[];
   lowStockThreshold?: number;
+  aiHint?: string; // Added aiHint
 }
 
 export interface HowToUseStep {
@@ -29,6 +30,7 @@ export interface HowToUseStep {
   title: string;
   mediaUrl: string;
   description: string;
+  aiHint?: string;
 }
 
 export interface BlogArticle {
@@ -44,6 +46,7 @@ export interface BlogArticle {
   relatedProducts?: Tool[];
   toc?: { id: string; title: string; level: number }[];
   date?: string; // Optional publish date
+  aiHint?: string;
 }
 
 export interface CategoryInfo {
