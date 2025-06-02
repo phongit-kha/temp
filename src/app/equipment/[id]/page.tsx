@@ -17,11 +17,13 @@ import { CalendarIcon, ChevronLeft, ChevronRight, AlertTriangle, ShoppingCart, T
 import { format } from "date-fns";
 import ProductCard from '@/components/shared/ProductCard';
 import { cn } from '@/lib/utils';
+import { useToast } from '@/hooks/use-toast';
 
 const EquipmentDetailsPage = () => {
   const params = useParams();
   const searchParamsHook = useSearchParams();
   const id = params.id as string;
+  const { toast } = useToast();
   
   const [tool, setTool] = useState<Tool | null>(null);
   const [selectedImage, setSelectedImage] = useState<string>('');
@@ -48,6 +50,21 @@ const EquipmentDetailsPage = () => {
     const urlAction = searchParamsHook.get('action');
     // Further logic can be added here if specific action (buy/rent) from ProductCard needs handling
   }, [id, searchParamsHook]);
+
+  const handleAddToCart = (action: 'rent' | 'buy') => {
+    if (!tool) return;
+    // Simulate adding to cart
+    let durationMessage = '';
+    if (action === 'rent') {
+      const days = rentalDays > 0 ? rentalDays : 1; // Default to 1 day if not properly calculated
+      durationMessage = ` for ${days} day(s)`;
+    }
+    console.log(`Adding ${tool.name} to cart for ${action}${durationMessage}.`);
+    toast({
+      title: "Added to Cart!",
+      description: `${tool.name} has been added to your cart for ${action}.`,
+    });
+  };
 
   if (!tool) {
     return <div className="container mx-auto px-4 py-8 text-center">Loading tool details or tool not found...</div>;
@@ -172,11 +189,21 @@ const EquipmentDetailsPage = () => {
 
             <div className="flex flex-col sm:flex-row gap-3">
               {purchasePrice && (
-                <Button size="lg" variant={isPurchaseCheaper ? "default" : "outline"} className={`flex-1 ${isPurchaseCheaper ? 'ring-2 ring-offset-2 ring-primary transform scale-105' : ''}`}>
+                <Button 
+                  size="lg" 
+                  variant={isPurchaseCheaper ? "default" : "outline"} 
+                  className={`flex-1 ${isPurchaseCheaper ? 'ring-2 ring-offset-2 ring-primary transform scale-105' : ''}`}
+                  onClick={() => handleAddToCart('buy')}
+                >
                   <Tag className="mr-2 h-5 w-5" /> Buy: ฿{purchasePrice.toLocaleString()}
                 </Button>
               )}
-              <Button size="lg" variant={!purchasePrice || !isPurchaseCheaper ? "default" : "outline"} className={`flex-1 ${!isPurchaseCheaper && purchasePrice ? 'ring-2 ring-offset-2 ring-primary transform scale-105' : ''}`}>
+              <Button 
+                size="lg" 
+                variant={!purchasePrice || !isPurchaseCheaper ? "default" : "outline"} 
+                className={`flex-1 ${!isPurchaseCheaper && purchasePrice ? 'ring-2 ring-offset-2 ring-primary transform scale-105' : ''}`}
+                onClick={() => handleAddToCart('rent')}
+              >
                 <ShoppingCart className="mr-2 h-5 w-5" /> Rent{rentalDays > 0 ? ` (฿${totalRentalPrice.toLocaleString()})` : `: ฿${rentPricePerDay.toLocaleString()}/day`}
               </Button>
             </div>
@@ -233,7 +260,7 @@ const EquipmentDetailsPage = () => {
           {tool.howToUseSteps && tool.howToUseSteps.length > 0 ? (
             <div className="grid lg:grid-cols-[300px_1fr] gap-8">
               {/* TOC */}
-              <aside className="border rounded-lg p-4 lg:sticky lg:top-24 h-fit">
+              <aside className="border rounded-lg p-4 lg:sticky lg:top-24 h-fit max-h-[calc(100vh-10rem)] overflow-y-auto">
                 <h3 className="text-lg font-semibold mb-3 font-headline">Table of Contents</h3>
                 <ul className="space-y-1">
                   {tool.howToUseSteps.map((step, index) => (
@@ -281,6 +308,3 @@ const EquipmentDetailsPage = () => {
 };
 
 export default EquipmentDetailsPage;
-
-
-    
