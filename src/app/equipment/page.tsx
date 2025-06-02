@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, type ChangeEvent } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import ProductCard from '@/components/shared/ProductCard';
@@ -20,6 +20,94 @@ import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { useToast } from '@/hooks/use-toast';
 
 const MAX_COMPARE_ITEMS = 4;
+
+interface EquipmentFilterPanelProps {
+  searchTerm: string;
+  onSearchTermChange: (term: string) => void;
+  selectedCategories: string[];
+  onCategoryChange: (categoryId: string) => void;
+  priceRange: [number, number];
+  onPriceRangeChange: (range: [number, number]) => void;
+  rentalDuration: string;
+  onRentalDurationChange: (duration: string) => void;
+  onClearAllFilters: () => void;
+}
+
+const EquipmentFilterPanel: React.FC<EquipmentFilterPanelProps> = ({
+  searchTerm,
+  onSearchTermChange,
+  selectedCategories,
+  onCategoryChange,
+  priceRange,
+  onPriceRangeChange,
+  rentalDuration,
+  onRentalDurationChange,
+  onClearAllFilters,
+}) => {
+  return (
+    <div className="space-y-6 p-1">
+      <Input
+        placeholder="Search by name..."
+        value={searchTerm}
+        onChange={(e: ChangeEvent<HTMLInputElement>) => onSearchTermChange(e.target.value)}
+        className="w-full"
+      />
+      <Accordion type="multiple" defaultValue={['categories', 'price']} className="w-full">
+        <AccordionItem value="categories">
+          <AccordionTrigger className="text-base font-semibold">Categories</AccordionTrigger>
+          <AccordionContent className="space-y-2 pt-2">
+            {mockCategories.map((category: CategoryInfo) => (
+              <div key={category.id} className="flex items-center space-x-2">
+                <Checkbox
+                  id={`cat-${category.id}`}
+                  checked={selectedCategories.includes(category.id)}
+                  onCheckedChange={() => onCategoryChange(category.id)}
+                />
+                <Label htmlFor={`cat-${category.id}`} className="font-normal cursor-pointer">{category.name}</Label>
+              </div>
+            ))}
+          </AccordionContent>
+        </AccordionItem>
+        <AccordionItem value="price">
+          <AccordionTrigger className="text-base font-semibold">Price Range (Rent)</AccordionTrigger>
+          <AccordionContent className="space-y-3 pt-3">
+            <Slider
+              min={0}
+              max={5000}
+              step={50}
+              value={priceRange}
+              onValueChange={(value) => onPriceRangeChange(value as [number, number])}
+              className="my-4"
+            />
+            <div className="flex justify-between text-sm text-muted-foreground">
+              <span>฿{priceRange[0]}</span>
+              <span>฿{priceRange[1]}</span>
+            </div>
+          </AccordionContent>
+        </AccordionItem>
+        <AccordionItem value="duration">
+          <AccordionTrigger className="text-base font-semibold">Rental Duration</AccordionTrigger>
+          <AccordionContent className="space-y-2 pt-2">
+            <Select value={rentalDuration} onValueChange={onRentalDurationChange}>
+              <SelectTrigger>
+                <SelectValue placeholder="Select duration" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="any">Any</SelectItem>
+                <SelectItem value="1day">1 Day</SelectItem>
+                <SelectItem value="3days">3 Days</SelectItem>
+                <SelectItem value="1week">1 Week</SelectItem>
+                <SelectItem value="custom">Custom</SelectItem>
+              </SelectContent>
+            </Select>
+          </AccordionContent>
+        </AccordionItem>
+      </Accordion>
+      <Button onClick={onClearAllFilters} variant="outline" className="w-full">Clear Filters</Button>
+    </div>
+  );
+};
+
 
 const EquipmentListPage = () => {
   const searchParams = useSearchParams();
@@ -89,74 +177,14 @@ const EquipmentListPage = () => {
     });
   };
 
-  const FilterPanelContent = () => (
-    <div className="space-y-6 p-1">
-      <Input 
-        placeholder="Search by name..."
-        value={searchTerm}
-        onChange={(e) => setSearchTerm(e.target.value)}
-        className="w-full"
-      />
-      <Accordion type="multiple" defaultValue={['categories', 'price']} className="w-full">
-        <AccordionItem value="categories">
-          <AccordionTrigger className="text-base font-semibold">Categories</AccordionTrigger>
-          <AccordionContent className="space-y-2 pt-2">
-            {mockCategories.map((category: CategoryInfo) => (
-              <div key={category.id} className="flex items-center space-x-2">
-                <Checkbox
-                  id={`cat-${category.id}`}
-                  checked={selectedCategories.includes(category.id)}
-                  onCheckedChange={() => handleCategoryChange(category.id)}
-                />
-                <Label htmlFor={`cat-${category.id}`} className="font-normal cursor-pointer">{category.name}</Label>
-              </div>
-            ))}
-          </AccordionContent>
-        </AccordionItem>
-        <AccordionItem value="price">
-          <AccordionTrigger className="text-base font-semibold">Price Range (Rent)</AccordionTrigger>
-          <AccordionContent className="space-y-3 pt-3">
-            <Slider
-              min={0}
-              max={5000}
-              step={50}
-              value={[priceRange[0], priceRange[1]]}
-              onValueChange={(value) => setPriceRange([value[0], value[1]])}
-              className="my-4"
-            />
-            <div className="flex justify-between text-sm text-muted-foreground">
-              <span>฿{priceRange[0]}</span>
-              <span>฿{priceRange[1]}</span>
-            </div>
-          </AccordionContent>
-        </AccordionItem>
-        <AccordionItem value="duration">
-          <AccordionTrigger className="text-base font-semibold">Rental Duration</AccordionTrigger>
-          <AccordionContent className="space-y-2 pt-2">
-            <Select value={rentalDuration} onValueChange={setRentalDuration}>
-              <SelectTrigger>
-                <SelectValue placeholder="Select duration" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="any">Any</SelectItem>
-                <SelectItem value="1day">1 Day</SelectItem>
-                <SelectItem value="3days">3 Days</SelectItem>
-                <SelectItem value="1week">1 Week</SelectItem>
-                <SelectItem value="custom">Custom</SelectItem> {/* Consider how custom duration would work */}
-              </SelectContent>
-            </Select>
-          </AccordionContent>
-        </AccordionItem>
-      </Accordion>
-      <Button onClick={() => {
-        setSelectedCategories([]);
-        setPriceRange([0, 5000]);
-        setRentalDuration('any');
-        setSearchTerm('');
-        setSelectedCompareIds([]); // Clear compare list too
-      }} variant="outline" className="w-full">Clear Filters</Button>
-    </div>
-  );
+  const clearAllFilters = () => {
+    setSelectedCategories([]);
+    setPriceRange([0, 5000]);
+    setRentalDuration('any');
+    setSearchTerm('');
+    setSelectedCompareIds([]);
+  };
+
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -164,7 +192,17 @@ const EquipmentListPage = () => {
         {/* Desktop Filter Panel */}
         <aside className="hidden md:block md:w-1/4 lg:w-1/5 sticky top-20 h-fit">
           <h2 className="text-xl font-bold mb-4 font-headline">Filters</h2>
-          <FilterPanelContent />
+          <EquipmentFilterPanel
+            searchTerm={searchTerm}
+            onSearchTermChange={setSearchTerm}
+            selectedCategories={selectedCategories}
+            onCategoryChange={handleCategoryChange}
+            priceRange={priceRange}
+            onPriceRangeChange={setPriceRange}
+            rentalDuration={rentalDuration}
+            onRentalDurationChange={setRentalDuration}
+            onClearAllFilters={clearAllFilters}
+          />
         </aside>
 
         <main className="w-full md:w-3/4 lg:w-4/5">
@@ -180,7 +218,17 @@ const EquipmentListPage = () => {
                 </SheetTrigger>
                 <SheetContent side="left" className="w-[300px] sm:w-[340px] p-4 overflow-y-auto">
                    <h2 className="text-xl font-bold mb-4 font-headline">Filters</h2>
-                   <FilterPanelContent />
+                   <EquipmentFilterPanel
+                      searchTerm={searchTerm}
+                      onSearchTermChange={setSearchTerm}
+                      selectedCategories={selectedCategories}
+                      onCategoryChange={handleCategoryChange}
+                      priceRange={priceRange}
+                      onPriceRangeChange={setPriceRange}
+                      rentalDuration={rentalDuration}
+                      onRentalDurationChange={setRentalDuration}
+                      onClearAllFilters={clearAllFilters}
+                    />
                 </SheetContent>
               </Sheet>
               <Button variant={layout === 'grid' ? 'default' : 'outline'} size="icon" onClick={() => setLayout('grid')}>
@@ -235,4 +283,3 @@ const EquipmentListPage = () => {
 };
 
 export default EquipmentListPage;
-
