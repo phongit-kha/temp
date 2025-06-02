@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -232,7 +233,7 @@ const EquipmentDetailsPage = () => {
           {tool.howToUseSteps && tool.howToUseSteps.length > 0 ? (
             <div className="grid lg:grid-cols-[300px_1fr] gap-8">
               {/* TOC */}
-              <aside className="border rounded-lg p-4 sticky top-24 h-fit">
+              <aside className="border rounded-lg p-4 lg:sticky lg:top-24 h-fit">
                 <h3 className="text-lg font-semibold mb-3 font-headline">Table of Contents</h3>
                 <ul className="space-y-1">
                   {tool.howToUseSteps.map((step, index) => (
@@ -280,3 +281,6 @@ const EquipmentDetailsPage = () => {
 };
 
 export default EquipmentDetailsPage;
+
+
+    
