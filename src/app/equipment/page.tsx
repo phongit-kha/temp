@@ -17,7 +17,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/
 import { Card, CardContent } from '@/components/ui/card';
 import { ListFilter, LayoutGrid, LayoutList, GitCompareArrows } from 'lucide-react';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
-import { toast } from 'sonner'; // Changed import
+import { toast } from 'sonner';
 
 const MAX_COMPARE_ITEMS = 4;
 
@@ -59,11 +59,11 @@ const EquipmentFilterPanel: React.FC<EquipmentFilterPanelProps> = ({
             {mockCategories.map((category: CategoryInfo) => (
               <div key={category.id} className="flex items-center space-x-2">
                 <Checkbox
-                  id={\`cat-\${category.id}\`}
+                  id={`cat-${category.id}`}
                   checked={selectedCategories.includes(category.id)}
                   onCheckedChange={() => onCategoryChange(category.id)}
                 />
-                <Label htmlFor={\`cat-\${category.id}\`} className="font-normal cursor-pointer">{category.name}</Label>
+                <Label htmlFor={`cat-${category.id}`} className="font-normal cursor-pointer">{category.name}</Label>
               </div>
             ))}
           </AccordionContent>
@@ -97,7 +97,7 @@ const EquipmentFilterPanel: React.FC<EquipmentFilterPanelProps> = ({
                 <SelectItem value="1day">1 Day</SelectItem>
                 <SelectItem value="3days">3 Days</SelectItem>
                 <SelectItem value="1week">1 Week</SelectItem>
-                <SelectItem value="custom">Custom</SelectItem>
+                <SelectItem value="custom">Custom (not implemented)</SelectItem>
               </SelectContent>
             </Select>
           </AccordionContent>
@@ -121,7 +121,7 @@ const EquipmentListPage = () => {
   useEffect(() => {
     const initialCategory = searchParams.get('category');
     if (initialCategory) {
-      setSelectedCategories([initialCategory]);
+      setSelectedCategories(prev => prev.includes(initialCategory) ? prev : [...prev, initialCategory]);
     }
     const initialSearchTerm = searchParams.get('search');
     if (initialSearchTerm) {
@@ -141,6 +141,8 @@ const EquipmentListPage = () => {
     }
 
     tools = tools.filter(tool => tool.priceRent >= priceRange[0] && tool.priceRent <= priceRange[1]);
+    // Add rental duration filter logic here if needed
+    
     setFilteredTools(tools);
   }, [selectedCategories, priceRange, rentalDuration, searchTerm]);
 
@@ -152,16 +154,17 @@ const EquipmentListPage = () => {
 
   const handleToggleCompareItem = (toolId: string) => {
     setSelectedCompareIds(prevIds => {
+      const toolName = mockTools.find(t => t.id === toolId)?.name || 'Tool';
       if (prevIds.includes(toolId)) {
-        toast("Removed from Compare", { description: \`\${mockTools.find(t=>t.id === toolId)?.name} removed from comparison.\` }); // Changed toast
+        toast(`${toolName} removed from comparison.`);
         return prevIds.filter(id => id !== toolId);
       } else {
         if (prevIds.length < MAX_COMPARE_ITEMS) {
-          toast("Added to Compare", { description: \`\${mockTools.find(t=>t.id === toolId)?.name} added for comparison.\` }); // Changed toast
+          toast(`${toolName} added for comparison.`);
           return [...prevIds, toolId];
         } else {
-          toast.error("Comparison Limit Reached", { // Changed toast
-            description: \`You can only select up to \${MAX_COMPARE_ITEMS} tools for comparison.\`,
+          toast.error("Comparison Limit Reached", {
+            description: `You can only select up to ${MAX_COMPARE_ITEMS} tools.`,
           });
           return prevIds;
         }
@@ -175,6 +178,8 @@ const EquipmentListPage = () => {
     setRentalDuration('any');
     setSearchTerm('');
     setSelectedCompareIds([]);
+    // Reset URL params if needed
+    // router.push('/equipment'); 
   };
 
   return (
@@ -236,7 +241,7 @@ const EquipmentListPage = () => {
                   {selectedCompareIds.length} / {MAX_COMPARE_ITEMS} tools selected for comparison.
                 </p>
                 <Button asChild>
-                  <Link href={\`/compare?products=\${selectedCompareIds.join(',')}\`}>
+                  <Link href={`/compare?products=${selectedCompareIds.join(',')}`}>
                     <GitCompareArrows className="mr-2 h-4 w-4" /> Compare Selected
                   </Link>
                 </Button>
@@ -245,7 +250,7 @@ const EquipmentListPage = () => {
           )}
 
           {filteredTools.length > 0 ? (
-            <div className={\`grid gap-6 \${layout === 'grid' ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3' : 'grid-cols-1'}\`}>
+            <div className={`grid gap-6 ${layout === 'grid' ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3' : 'grid-cols-1'}`}>
               {filteredTools.map(tool => (
                 <ProductCard 
                   key={tool.id} 
@@ -262,7 +267,7 @@ const EquipmentListPage = () => {
             </div>
           )}
           <div className="mt-12 flex justify-center">
-            <Button variant="outline">Load More</Button>
+            <Button variant="outline">Load More</Button> {/* Pagination/Infinite Scroll would go here */}
           </div>
         </main>
       </div>
