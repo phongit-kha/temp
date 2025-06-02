@@ -9,7 +9,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { UploadCloud, ListChecks, Loader2, AlertTriangle, FileText as FileTextIcon, Type } from 'lucide-react';
 import { suggestToolsFromUpload, SuggestToolsFromUploadOutput } from '@/ai/flows/suggest-tool-from-upload';
 import { useToast } from '@/hooks/use-toast';
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
 
 const AiSuggestToolPage = () => {
@@ -109,64 +109,56 @@ const AiSuggestToolPage = () => {
         </CardHeader>
         <form onSubmit={handleSubmit}>
           <CardContent className="space-y-6">
-            <Accordion type="single" collapsible defaultValue="text" value={inputType} onValueChange={(value) => setInputType(value as 'text' | 'file')}>
-              <AccordionItem value="text">
-                <AccordionTrigger className="text-base">
-                  <div className="flex items-center">
-                    <Type className="mr-2 h-5 w-5 text-primary" />
-                    Project Description (Text)
-                  </div>
-                </AccordionTrigger>
-                <AccordionContent className="pt-4">
-                  <Label htmlFor="project-description-text" className="block text-sm font-medium mb-2">Enter your project details</Label>
-                  <Textarea
-                    id="project-description-text"
-                    placeholder="E.g., I'm planning to build a wooden deck in my backyard, approximately 3x4 meters..."
-                    value={projectDescription}
-                    onChange={(e) => setProjectDescription(e.target.value)}
-                    rows={5}
-                    className="min-h-[100px]"
-                  />
-                </AccordionContent>
-              </AccordionItem>
-              <AccordionItem value="file">
-                <AccordionTrigger className="text-base">
-                  <div className="flex items-center">
-                     <UploadCloud className="mr-2 h-5 w-5 text-primary" />
-                    Project Document (Upload)
-                  </div>
-                </AccordionTrigger>
-                <AccordionContent className="pt-4">
-                  <Label htmlFor="project-document-input" className="block text-sm font-medium mb-2">Upload your project plan or brief</Label>
-                  <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-dashed rounded-md hover:border-primary transition-colors">
-                      <div className="space-y-1 text-center">
-                        <UploadCloud className="mx-auto h-10 w-10 text-muted-foreground" />
-                        <div className="flex text-sm text-muted-foreground">
-                          <Label
-                            htmlFor="project-document-input-inner"
-                            className="relative cursor-pointer rounded-md font-medium text-primary hover:text-primary/80 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-primary"
-                          >
-                            <span>Upload a file</span>
-                            <Input id="project-document-input-inner" name="project-document" type="file" className="sr-only" onChange={handleFileChange} accept=".txt,.doc,.docx,.pdf" />
-                          </Label>
-                          <p className="pl-1">or drag and drop</p>
-                        </div>
-                        <p className="text-xs text-muted-foreground">TXT, DOC, DOCX, PDF files up to 5MB</p>
+            <Tabs value={inputType} onValueChange={(value) => setInputType(value as 'text' | 'file')} className="w-full">
+              <TabsList className="grid w-full grid-cols-2">
+                <TabsTrigger value="text">
+                  <Type className="mr-2 h-5 w-5" /> Text Input
+                </TabsTrigger>
+                <TabsTrigger value="file">
+                  <UploadCloud className="mr-2 h-5 w-5" /> File Upload
+                </TabsTrigger>
+              </TabsList>
+              <TabsContent value="text" className="pt-4">
+                <Label htmlFor="project-description-text" className="block text-sm font-medium mb-2">Enter your project details</Label>
+                <Textarea
+                  id="project-description-text"
+                  placeholder="E.g., I'm planning to build a wooden deck in my backyard, approximately 3x4 meters..."
+                  value={projectDescription}
+                  onChange={(e) => setProjectDescription(e.target.value)}
+                  rows={5}
+                  className="min-h-[100px]"
+                />
+              </TabsContent>
+              <TabsContent value="file" className="pt-4">
+                <Label htmlFor="project-document-input" className="block text-sm font-medium mb-2">Upload your project plan or brief</Label>
+                <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-dashed rounded-md hover:border-primary transition-colors">
+                    <div className="space-y-1 text-center">
+                      <UploadCloud className="mx-auto h-10 w-10 text-muted-foreground" />
+                      <div className="flex text-sm text-muted-foreground">
+                        <Label
+                          htmlFor="project-document-input-inner"
+                          className="relative cursor-pointer rounded-md font-medium text-primary hover:text-primary/80 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-primary"
+                        >
+                          <span>Upload a file</span>
+                          <Input id="project-document-input-inner" name="project-document" type="file" className="sr-only" onChange={handleFileChange} accept=".txt,.doc,.docx,.pdf" />
+                        </Label>
+                        <p className="pl-1">or drag and drop</p>
                       </div>
+                      <p className="text-xs text-muted-foreground">TXT, DOC, DOCX, PDF files up to 5MB</p>
                     </div>
-                  {file && (
-                    <div className="mt-3 p-3 border rounded-md bg-secondary/50 flex items-center justify-between">
-                      <div className="flex items-center space-x-2">
-                        <FileTextIcon className="h-5 w-5 text-primary" />
-                        <span className="text-sm font-medium">{file.name}</span>
-                        <span className="text-xs text-muted-foreground">({(file.size / 1024).toFixed(1)} KB)</span>
-                      </div>
-                      <Button variant="ghost" size="sm" onClick={() => { setFile(null); setFileContent(''); setError(null); }}>Clear</Button>
+                  </div>
+                {file && (
+                  <div className="mt-3 p-3 border rounded-md bg-secondary/50 flex items-center justify-between">
+                    <div className="flex items-center space-x-2">
+                      <FileTextIcon className="h-5 w-5 text-primary" />
+                      <span className="text-sm font-medium">{file.name}</span>
+                      <span className="text-xs text-muted-foreground">({(file.size / 1024).toFixed(1)} KB)</span>
                     </div>
-                  )}
-                </AccordionContent>
-              </AccordionItem>
-            </Accordion>
+                    <Button variant="ghost" size="sm" onClick={() => { setFile(null); setFileContent(''); setError(null); }}>Clear</Button>
+                  </div>
+                )}
+              </TabsContent>
+            </Tabs>
 
             {error && (
               <div className="p-3 bg-destructive/10 border border-destructive/30 rounded-md text-destructive flex items-center">
@@ -208,3 +200,4 @@ const AiSuggestToolPage = () => {
 };
 
 export default AiSuggestToolPage;
+
