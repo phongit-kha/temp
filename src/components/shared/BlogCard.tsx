@@ -36,13 +36,13 @@ const BlogCard: React.FC<BlogCardProps> = ({ article }) => {
             {article.excerpt}
           </CardDescription>
           <div className="flex flex-wrap gap-2 mb-3">
-            <Badge variant="outline" className="text-xs">
+            <Badge variant="secondary" className="text-xs">
               <Zap className="h-3 w-3 mr-1" /> {article.difficulty}
             </Badge>
-            <Badge variant="outline" className="text-xs">
+            <Badge variant="secondary" className="text-xs">
               <Clock className="h-3 w-3 mr-1" /> {article.duration}
             </Badge>
-            <Badge variant="outline" className="text-xs">
+            <Badge variant="secondary" className="text-xs">
               <DollarSign className="h-3 w-3 mr-1" /> {article.cost}
             </Badge>
           </div>
